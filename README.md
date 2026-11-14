@@ -13,28 +13,31 @@ training seeds, and a study of zero-cost proxies on it. Everything is measured w
 |---|---|---|
 | Sweep (accuracy, 2 seeds; proxies and cost estimate at seed-0 init) | `sweep_gpu.py` | `results/sweep/*.jsonl` |
 | ezkl calibration of trained seed-0 networks with real CIFAR-10 inputs, with ONNX-op features | `calibrate_trained.py` | `results/trained_calibration.jsonl`, `results/trained_calibration_skipped.json` |
-| ezkl timings and quantized accuracy on trained networks | `time_ezkl.py` | `results/ezkl_timing_trained.jsonl` |
+| ezkl timings (repeated) and quantized accuracy on trained networks | `time_ezkl.py` | `results/ezkl_timing_trained.jsonl` (used in the paper); `results/ezkl_timing_trained_run2_partial.jsonl` is an incomplete second run (3 repeats at logrows 20-21; stopped before the logrows-22 circuits) and is not used |
+| Full ezkl `settings.json` for 72 stratified trained networks (logrows accounting rule) | `calibrate_trained.py` with `DUMP_SETTINGS_DIR` | `results/settings_dump/` |
+| 3-seed, 30- vs 100-epoch validation of 26 architectures | `sweep_gpu.py --seed {42,43,44} --epochs {30,100} --only ... --no-proxies` | `results/multiseed/`, `results/multiseed_summary.json` (`analyze_multiseed.py`) |
 | Width-matched activation comparison, untrained (3 seeds) | `matched_width_activation_cost.py` | `results/matched_width_activation*.json` |
-| All sweep statistics (correlations, partial correlations, search, cost-model fit) | `analyze_sweep.py` | `results/sweep_summary.json` |
+| All sweep statistics (correlations, partial correlations, search, cost-model fit and cross-validation, logrows rule) | `analyze_sweep.py` | `results/sweep_summary.json` |
 | LaTeX tables and numbers in the prose | `make_tables.py`, `render_results.py` | `paper/tables/`, `paper/results_auto.tex` |
 
 Regenerate the statistics and the tables from the released data (no GPU or ezkl needed):
 
 ```bash
-python analyze_sweep.py --sweep results/sweep --calib results/trained_calibration.jsonl --out results/sweep_summary.json
+python analyze_sweep.py --sweep results/sweep --calib results/trained_calibration.jsonl --settings results/settings_dump --out results/sweep_summary.json
+python analyze_multiseed.py
 python make_tables.py && python render_results.py
 ```
 
 ## Main findings
 
-- **Cost model** (Eq. 1 in the paper): fitted by non-negative least squares on trained, calibrated networks and evaluated on a disjoint split; about one assigned cell per multiply-accumulate and no per-node overhead; weak agreement for x^3+x networks.
+- **Cost model** (Eq. 1 in the paper): fitted by non-negative least squares on trained, calibrated networks and evaluated on a disjoint split and by cross-validation; about one assigned cell per multiply-accumulate and no per-node overhead. ezkl's `logrows` equals the maximum of four requirements (rows, constants, lookup table, range-check table) on all 72 dumped networks; the x^3+x anomaly is a 2^22-entry range-check table.
 - **Negative result**: width-matched, ReLU and x^2 networks have the same calibrated logrows (untrained and trained). A claim in an earlier version that ReLU is much more expensive than x^2 is withdrawn.
 - **Proxies**: NEAR predicts accuracy only on ReLU networks; ZenNAS is anti-correlated; a pre-activation-sign NASWOT variant is negatively correlated on polynomial networks; ZiCo's success on x^3+x disappears when failed runs are removed. 38-60% of polynomial networks fail to train.
 - **Search**: under ezkl-calibrated budgets a tuned joint proxy is indistinguishable from NEAR-only (an earlier claim of a gain is withdrawn).
 
 ## Not included
 
-Trained weights (about 2 GB), the raw output of the earlier three-seed 100-epoch job (only `results/gpu_validation_summary.json` is included), and CIFAR-100 / ImageNet-16-120 sweeps (withdrawn: the files could not be recovered). The `results/legacy/` directory holds files from an
+Trained weights (about 0.7 GB) and CIFAR-100 / ImageNet-16-120 sweeps (withdrawn: the files could not be recovered). `results/gpu_validation_summary.json` summarizes an earlier three-seed job whose raw output was not retained; the paper no longer uses it (the validation was rerun, `results/multiseed/`). The `results/legacy/` directory holds files from an earlier version of this work; they are superseded.
 earlier version of this work; they are superseded and are not used by the current paper.
 
 ## Notes

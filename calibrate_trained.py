@@ -47,6 +47,9 @@ def worker(name: str, weights: str, n_cal: int) -> None:
         json.dump({"input_data": [x[i].flatten().tolist() for i in range(n_cal)]}, open(cal, "w"))
         assert ezkl.calibrate_settings(cal, onnx_path, settings, target="resources")
         s = json.load(open(settings))
+        if os.environ.get("DUMP_SETTINGS_DIR"):
+            os.makedirs(os.environ["DUMP_SETTINGS_DIR"], exist_ok=True)
+            json.dump(s, open(os.path.join(os.environ["DUMP_SETTINGS_DIR"], name + ".settings.json"), "w"), indent=1)
         res.update({"logrows": s["run_args"]["logrows"], "num_rows": s.get("num_rows"),
                     "total_assignments": s.get("total_assignments"), "input_scale": s["run_args"].get("input_scale"),
                     "lookup_range": s["run_args"].get("lookup_range")})

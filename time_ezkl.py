@@ -79,7 +79,8 @@ def run(name, a):
             vk, pk = os.path.join(d, "vk"), os.path.join(d, "pk")
             t = time.perf_counter(); assert ezkl.setup(compiled, vk, pk, srs); res["setup_s"] = time.perf_counter() - t
             res["prove_s"], res["verify_s"] = [], []
-            n_prove = a.prove_repeats_large if res["logrows"] >= a.large_logrows else a.prove_repeats
+            n_prove = (a.prove_repeats_huge if res["logrows"] >= a.huge_logrows else
+                       a.prove_repeats_large if res["logrows"] >= a.large_logrows else a.prove_repeats)
             for _ in range(n_prove):
                 proof = os.path.join(d, "proof.json")
                 t = time.perf_counter(); assert ezkl.prove(wit, compiled, pk, proof, "single", srs); res["prove_s"].append(time.perf_counter() - t)
@@ -111,6 +112,8 @@ def main():
     ap.add_argument("--prove-repeats", type=int, default=3); ap.add_argument("--max-prove-logrows", type=int, default=22)
     ap.add_argument("--prove-repeats-large", type=int, default=1, help="prove repeats when logrows >= --large-logrows")
     ap.add_argument("--large-logrows", type=int, default=20)
+    ap.add_argument("--prove-repeats-huge", type=int, default=1, help="prove repeats when logrows >= --huge-logrows")
+    ap.add_argument("--huge-logrows", type=int, default=22)
     ap.add_argument("--acc-images", type=int, default=100)
     a = ap.parse_args()
     h = host(); print(json.dumps(h), flush=True)

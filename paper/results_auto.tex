@@ -13,92 +13,54 @@ and the CIFAR-100 ReLU subset had only three networks.
 
 \textbf{Training.}  30-epoch SGD (momentum $0.9$, weight decay $5{\times}10^{-4}$, cosine schedule, batch $128$, random crop with padding $4$
 and horizontal flip), learning rate $0.1$, or $0.01$ with gradient clipping $1.0$ for polynomial networks without normalization.  The sweep is
-run by \texttt{sweep\_gpu.py}, which keeps this recipe but holds the dataset and the augmentation on the GPU.  As a check against the original CPU pipeline,
-three architectures trained for the full $30$ epochs give $77.45\%$ for the CNN ReLU (earlier $77.1\%$; three-seed mean $76.98\%$), $75.42\%$ for the DWS ReLU
-(earlier $75.0\%$; $74.73\%$) and $54.14\%$ for the $x^2{+}x$ MLP (earlier $51.1\%$; $50.67\%$); the last is about three points higher than before, so we do
-not claim exact equivalence to the earlier pipeline.  Every architecture is trained with two seeds (0 and 1).  Zero-cost proxies and the cost estimate are computed
+run by \texttt{sweep\_gpu.py}, which follows this recipe with two differences from the earlier CPU pipeline: the dataset and the augmentation live on the GPU, and the random-crop padding
+adds zeros in normalized space, whereas the earlier pipeline padded raw images with black pixels (which normalize to a nonzero constant).  The two pipelines are therefore not identical, and
+accuracies are not comparable across them: for the 8 architectures shared with the earlier version the two-seed sweep mean is higher than the earlier three-seed 30-epoch mean for
+8 of 8 (by +0.8 to +5.6 points; +5.6 for the LayerNorm $x^2{+}x$ MLP).  All comparisons in this paper use the new sweep only.  Every architecture is trained with two seeds (0 and 1).  Zero-cost proxies and the cost estimate are computed
 once, at the seed-0 initialization.  A network is called \emph{failed} if training diverged or its mean test accuracy is below $15\%$.
 
 \textbf{ezkl.}  All calibrations in this section use ezkl 9.5.0 (\texttt{calibrate\_settings}, \texttt{target=resources}), $20$ real CIFAR-10 test images as calibration
-inputs, and the seed-0 \emph{trained} weights, on a 24-logical-core AMD Threadripper PRO 3945WX host shared with other jobs.  Networks that failed to train
-(nothing meaningful to calibrate) and networks whose estimated $\logrows$ exceeds $25$ (irrelevant to the budgets studied) were not calibrated; the list is released.
-Of the 255 calibrations attempted, 12 failed inside ezkl and are excluded from pools.
+inputs, and the seed-0 \emph{trained} weights, on a 24-logical-core AMD Threadripper PRO 3945WX host shared with other jobs.  One rule decides which networks enter every calibration-based analysis: networks whose seed-0 training failed (nothing meaningful to calibrate)
+and networks whose estimated $\logrows$ exceeds $25$ (irrelevant to the budgets studied) are excluded.  255 networks were calibrated; 21 of them met the exclusion rule (they were calibrated in an early pass
+before the rule was applied) and are dropped, leaving 234, of which 0 failed inside ezkl.  The dropped and skipped lists are released.
 
 \textbf{Released data.}  Per-architecture results for both seeds (accuracy, proxies at initialization, cost estimate), the calibration records with the per-operator
 features used for fitting, and every summary number in this section are in the repository, together with the scripts that regenerate Tables~\ref{tab:corr}--\ref{tab:ezkl}.
-The raw output of the earlier three-seed job (Section~\ref{sec:robust}) is not released.
+Trained network weights (about 0.7 GB) are not released.
 
 \subsection{Label Noise and Training Failures}
 
 Across the two seeds the median per-architecture standard deviation of test accuracy is 0.24 points (90th percentile 1.53; the maximum, 45.4,
 is a network that trained in one seed and failed in the other), and the Spearman correlation between the two seeds' accuracies is 0.95.
 Label noise is therefore small relative to differences between architectures.  \emph{Training failure} is large and depends on the recipe:
-153 of the 474 networks have mean accuracy below $15\%$.  Failures by activation are 0 of 111 (ReLU), 50 of 121 ($x^2$),
+a network is \emph{failed} if training diverged in at least one seed or its mean accuracy is below $15\%$; 170 of the 474 networks failed, and 153 of them have mean accuracy below $15\%$.
+Failures by activation are 0 of 111 (ReLU), 50 of 121 ($x^2$),
 73 of 121 ($x^3{+}x$) and 47 of 121 ($x^2{+}x$); by normalization, 37 none, 49 LayerNorm and 84 GroupNorm
 (polynomial networks with normalization use the larger learning rate, so normalization does not prevent failure here).  The accuracy labels of polynomial networks are therefore
 partly trainability labels, and we report results with and without the failed networks.
 
-\subsection{Earlier Multi-Seed and Training-Budget Validation}
+\subsection{Multi-Seed and Training-Budget Validation}
 \label{sec:robust}
 
-Table~\ref{tab:robustness} reports the replication of the eight architectures that
-appeared in the earlier version's timing table.  All values are test top-1 accuracy; multi-seed entries are
-mean $\mathbin{\pm}$ sample standard deviation over three seeds.  Every
-single-seed value is within $1.2$ percentage points of the corresponding
-three-seed 30-epoch mean.  In particular, the DWS ReLU (32/64/128/256) network, the architecture selected in the earlier version's search, replicates at $74.73\%\mathbin{\pm}1.61\%$ and reaches
-$79.96\%\mathbin{\pm}0.40\%$ after 100 epochs.
+To check that 30-epoch accuracy is a usable ranking signal, we retrained 26 architectures (the eight architectures of the earlier version's timing table plus activation-matched controls for ReLU, $x^2$, $x^3{+}x$ and $x^2{+}x$)
+with three seeds (42, 43, 44) at 30 and at 100 epochs, each with a fresh cosine schedule, using the same \texttt{sweep\_gpu.py} pipeline as the sweep; all 156 of 156 planned runs completed
+(8 diverged and are included at chance level) and the per-run outputs are released (Table~\ref{tab:robustness}).  Across architecture means the 30- to 100-epoch Spearman correlation is 0.949 ($n=26$);
+across the 78 paired runs it is 0.952, and the three seed-wise correlations range from 0.942 to 0.964.  Accuracy rises by 6.13 points on average from 30 to 100 epochs,
+so the longer budget changes accuracy levels more than ordering; some deep polynomial networks learn late, so the ordering is not exact.  The largest seed standard deviation at 30 epochs is 15.08 points.
+This job replaces an earlier three-seed validation run on a different GPU whose raw output was not retained; its numbers are not used.
 
-The activation-matched controls reinforce that activation effects are
-architecture-dependent.  ReLU remains the highest-accuracy choice in each
-matched convolutional group, while $x^2{+}x$ is the strongest polynomial
-alternative.  In the normalization-free MLP, however, $x^2{+}x$ reaches
-$55.67\%$ at 100 epochs versus $53.52\%$ for ReLU.  Pure-$x^2$ DWS controls
-remain at chance accuracy under both budgets, so polynomial activations should
-not be treated as interchangeable.
-
-\begin{table}[h]
-\centering
-\caption{Multi-seed replication and longer-training validation of the eight
-  architectures used in the accuracy/proving table.  ``Original'' is the
-  reported single-seed result; validation columns use fresh training runs.}
-\label{tab:robustness}
-\small
-\begin{tabular}{lrrr}
-\toprule
-\textbf{Architecture} & \textbf{Original 30 ep.} & \textbf{3-seed 30 ep.} & \textbf{3-seed 100 ep.} \\
-\midrule
-MLP $x^2{+}x$, none (128/64/32)       & $51.1$ & $50.67\mathbin{\pm}0.52$ & $55.67\mathbin{\pm}0.32$ \\
-MLP $x^2{+}x$, LN (128/64/32)         & $52.0$ & $50.87\mathbin{\pm}1.16$ & $54.10\mathbin{\pm}1.77$ \\
-DWS ReLU (16/32/64)                   & $62.9$ & $64.10\mathbin{\pm}0.52$ & $67.52\mathbin{\pm}1.12$ \\
-DWS ReLU (32/64/128)                  & $69.3$ & $70.48\mathbin{\pm}1.30$ & $75.70\mathbin{\pm}0.71$ \\
-DWS ReLU (32/64/128/256)              & $75.0$ & $74.73\mathbin{\pm}1.61$ & $79.96\mathbin{\pm}0.40$ \\
-CNN ReLU (16/32/64)                   & $77.1$ & $76.98\mathbin{\pm}0.72$ & $79.80\mathbin{\pm}0.46$ \\
-CNN ReLU (16/32/64/128)               & $81.6$ & $81.31\mathbin{\pm}0.53$ & $84.20\mathbin{\pm}0.32$ \\
-CNN ReLU (64/128/256)                 & $83.9$ & $83.96\mathbin{\pm}0.16$ & $86.25\mathbin{\pm}0.21$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Across all 26 architecture means, the 30- to 100-epoch Spearman correlation
-is $\rho=0.932$.  Across the 77 successful architecture-seed pairs it is
-$\rho=0.941$, and the three seed-wise correlations range from $0.929$ to
-$0.964$.  Absolute accuracy rises by $5.88$ percentage points on average, so
-the longer budget changes accuracy levels more than relative ordering.  The
-ordering is strong but not perfect: some deep polynomial CNNs learn late.
-Of 156 planned runs, 154 complete; both divergences are the same
-$x^3{+}x$ LayerNorm MLP under seed 44, once at each epoch budget, with a
-non-finite loss during epoch 1.
-
+\input{tables/robustness}
 
 \subsection{Zero-Cost Proxies Across Activation Families}
 
 Table~\ref{tab:corr} gives Spearman $\rho$ between each proxy and mean accuracy per activation family with bootstrap intervals and Holm-adjusted
-significance over the 32 activation-family tests it contains.  NEAR is a reliable predictor only for ReLU networks
+significance over the 25 activation-family tests it contains.  NEAR is a reliable predictor only for ReLU networks
 ($\rho=+0.70$, $95\%$ CI $[+0.57,+0.80]$); on the polynomial families its intervals include zero
-($x^2$ -0.12 $[-0.29,+0.05]$, $x^3{+}x$ +0.01, $x^2{+}x$ -0.14).  ZenNAS is negatively correlated in every family
-(ReLU -0.23, $x^2$ -0.42, $x^3{+}x$ -0.31, $x^2{+}x$ -0.54).  ZiCo is the one proxy with a significant positive coefficient on a polynomial family
+($x^2$ -0.12 $[-0.29,+0.05]$, $x^3{+}x$ +0.01, $x^2{+}x$ -0.14).  ZenNAS is negatively correlated with accuracy in every family in this analysis
+(ReLU -0.23, $x^2$ -0.42, $x^3{+}x$ -0.31, $x^2{+}x$ -0.54), but not robustly: with a common training recipe its ReLU correlation is +0.19 (Table~\ref{tab:corrsame}) and its partial correlation on ReLU is +0.02.  ZiCo is the one proxy with a significant positive coefficient on a polynomial family
 ($x^3{+}x$, +0.45), but once failed networks are removed (Table~\ref{tab:corrnofail}) it is -0.38 on $x^3{+}x$ and -0.50 on $x^2$:
 its apparent success on $x^3{+}x$ comes from separating networks that train from networks that do not, not from ranking accuracy among those that train.
+Removing failed networks changes other conclusions too: Holm-significant entries lost are NASWOT-sign on $x^2$; NASWOT-sign on $x^2{+}x$; NASWOT-sign on $x^3{+}x$; ZenNAS on $x^2$; ZiCo on $x^3{+}x$; entries gained are Synflow on $x^2$; Synflow on $x^2{+}x$; ZenNAS on $x^3{+}x$; ZiCo on $x^2$; ZiCo on $x^2{+}x$.  The negative correlations of ZenNAS and of the sign-pattern NASWOT variant are therefore partly trainability effects.
 MeCo and Synflow are weak or inconsistent.
 
 Two controls address confounds.  Table~\ref{tab:corrsame} restricts to normalized networks, where every activation was trained with the same recipe, and the picture is the same
@@ -133,11 +95,11 @@ This is descriptive: it is consistent with Zen rewarding size and depth, which a
 
 \textbf{Width-matched comparison.}  Table~\ref{tab:matchedtrained} repeats the width-matched comparison of Section~\ref{sec:findings} on trained networks calibrated with real inputs.
 The result is unchanged: ReLU and $x^2$ networks have the same $\logrows$ in all five unnormalized skeletons, and unnormalized $x^3{+}x$ networks calibrate to $\logrows{=}23$ in every skeleton.
-Across all 52 ReLU/$x^2$ pairs in the sweep that share a skeleton and were calibrated, 47 have the same $\logrows$, in 4 the $x^2$ network is smaller and in 1 it is larger; the median
+Across all 50 ReLU/$x^2$ pairs in the sweep that share a skeleton and were calibrated, 45 have the same $\logrows$, in 4 the $x^2$ network is smaller and in 1 it is larger; the median
 ratio of assigned cells ($x^2$/ReLU) is 1.03.
 
-\textbf{Accounting.}  $\lceil\log_2 C\rceil$ equals the calibrated $\logrows$ for 153/201 trained ReLU, $x^2$ and $x^2{+}x$ networks (ReLU 62/80, $x^2$ 44/57, $x^2{+}x$ 47/64) and for
-19/42 of the $x^3{+}x$ networks.  The identity is therefore not exact for trained networks with normalization or residual structure, where calibration sometimes enlarges the circuit.
+\textbf{Accounting.}  $\lceil\log_2 C\rceil$ equals the calibrated $\logrows$ for 146/194 trained ReLU, $x^2$ and $x^2{+}x$ networks (ReLU 59/77, $x^2$ 42/55, $x^2{+}x$ 45/62) and for
+17/40 of the $x^3{+}x$ networks.  The identity is therefore not exact for trained networks with normalization or residual structure, where calibration sometimes enlarges the circuit.
 
 \textbf{Timings.}  Table~\ref{tab:ezkl} replaces the timings of the earlier version, whose ezkl version, settings, weight state and hardware were not recorded.  It covers 7 trained seed-0 networks at $\logrows$ 19--22
 with real inputs, one ezkl version and one host.  Mock proofs were repeated three times (spread at most 19\% of the median) and take 2--42\,s.
@@ -150,12 +112,13 @@ The quantized circuits agree with the float models on 700 of 700 real test-image
 
 \subsection{Budget-Constrained Architecture Search}
 
-\textbf{Protocol.}  The pool is the 243 calibrated trained networks; for a budget $B$ it contains those with calibrated $\logrows\le B$.  A method selects $K=10$ networks to train, and the outcome is the best mean accuracy among them.
-Each of 300 random $50/50$ splits of the pool tunes $\lambda$ for the joint proxy on one half and evaluates all methods on the other.  Table~\ref{tab:search} reports regret against the best network in the evaluation half.
+\textbf{Protocol.}  The pool is the 234 calibrated trained networks; for a budget $B$ it contains those with calibrated $\logrows\le B$.  A method selects $K=10$ networks to train, and the outcome is the best mean accuracy among them.
+The joint proxy's cost term is ezkl's \emph{calibrated} assigned cells, an oracle cost that is at least as informative as the model's estimate, so the comparison favors the joint proxy.
+Each of 300 random $50/50$ splits of the pool tunes $\lambda$ over $\{0,0.25,0.5,1,2,4\}$ for the joint proxy on one half (strict improvement is required to move away from a smaller $\lambda$, so ties go to $\lambda=0$, i.e.\ NEAR-only) and evaluates all methods on the other.  Table~\ref{tab:search} reports regret against the best network in the evaluation half.
 Failed networks are not in the pool, so no method can be penalized for selecting one; this is a limitation.
 
 \textbf{Result.}  Under calibrated budgets the tuned joint proxy is indistinguishable from NEAR-only: $\lambda=0$ is chosen in 95\% of tuning splits, so the two select the same networks, and Joint ties NEAR-only in almost
-every split at $K=10$ (win/tie/loss against NEAR-only: 0/300/0, 0/300/0, 0/300/0, 19/280/1 at $B=20,21,22,23$).  We therefore withdraw the earlier claim that the joint proxy improves on NEAR-only.
+every split at $K=10$ (win/tie/loss against NEAR-only: 0/300/0, 0/300/0, 0/300/0, 19/280/1 at $B=20,21,22,23$).  Because ties favor $\lambda=0$ by construction, we also report the untuned test (Table~\ref{tab:lambda}): the mean regret of each fixed $\lambda$ on the evaluation halves is at its minimum at $\lambda=$ 0.0, 0.0, 0.0, 0.25 for $B=20,\dots,23$, with regret 0.02, 0.04, 0.33, 3.61 at $\lambda=0$ against 0.02, 0.04, 0.33, 2.93 at the best fixed $\lambda$.  We therefore withdraw the earlier claim that the joint proxy improves on NEAR-only.
 NEAR-only does beat random selection by a wide margin at every budget (regret 0.02 vs.\ 1.58 at $B=20$, 0.04 vs.\ 4.18 at $21$, 0.33 vs.\ 7.47 at $22$ and
 3.61 vs.\ 8.63 at $23$ accuracy points), and ranking by cost alone is poor (1.77 to 19.35).  The pools are mixed: ReLU networks are 28--33\% of each, and among the $K=10$ highest-NEAR networks at $B=20,\dots,23$ there are 7, 7, 7 and 3 polynomial
 networks.  Because $K=10$ is a large share of the smaller pools, we repeat the comparison with $K=5$: regret is then 0.88, 0.39, 4.17 and 7.07 for NEAR-only against 3.43, 6.62, 11.78 and 12.91 for random selection,
@@ -167,18 +130,29 @@ violates the calibrated budget in every case, whereas choosing inside the estima
 but not all budget violations; it does not replace calibration.
 
 \input{tables/search}
+\input{tables/lambda}
 \input{tables/estbudget}
 
 \subsection{Cost-Model Fit and Evaluation}
 
-Table~\ref{tab:costfit} fits the coefficients of Eq.~\eqref{eq:cost} by non-negative least squares on 187 trained networks and evaluates on the 56 networks of the earlier validation set (excluded from the fit).
-On the evaluation split the hand-set proxy matches the calibrated $\logrows$ exactly for 39 and within one for 52 of 56 (Spearman 0.82, RMSE 0.18 in $\log_2$ cells);
-the fitted model for 43 and 53 (0.86, 0.11).  Fitted coefficients are close to one assigned cell per multiply-accumulate (standard convolution 0.93, depthwise
+Table~\ref{tab:costfit} fits the coefficients of Eq.~\eqref{eq:cost} by non-negative least squares on 180 trained networks and evaluates on the 54 networks that remain, after the exclusion rule, from a $73$-network validation sample drawn earlier (a stratified sample of MLP, CNN and DWS-CNN architectures; no ResNet-style networks), which are excluded from the fit.
+Because that evaluation split contains no ResNet-style networks while 82 of the fit networks are ResNet-style, we also report repeated $5$-fold cross-validation over all 234 calibrated networks: the hand-set proxy matches the calibrated $\logrows$ exactly for 68\% and within one for 93\% (Spearman 0.87), the fitted model for 70\% and 95\% (0.89), and the fitted model is exact for 100\% of the 16 ResNet-style and 66\% of the 66 depthwise ResNet-style networks.
+On the evaluation split the hand-set proxy matches the calibrated $\logrows$ exactly for 37 and within one for 50 of 54 (Spearman 0.80, RMSE 0.19 in $\log_2$ cells);
+the fitted model for 39 and 51 (0.84, 0.11).  Fitted coefficients are close to one assigned cell per multiply-accumulate (standard convolution 0.94, depthwise
 1.11, Gemm 0.99) and \emph{zero} per matrix-multiply or convolution node, so the hand-set per-node overhead of $4096$ cells is not supported by the data.  Per-element costs are
-15.04 (ReLU), 12.45 (power), 5.55 (normalization), 2.21 (multiplication) and 3.47 (addition), so ReLU and the polynomial power operator cost the same order of magnitude per element, consistent
-with Section~\ref{sec:findings}.  Agreement is weaker for $x^3{+}x$ networks (exact on 3/7 of the evaluation networks), where calibration, not cell count, sets the circuit size.  $\varepsilon$ in Eq.~\eqref{eq:cost} is reported
+14.82 (ReLU), 12.30 (power), 5.57 (normalization), 2.28 (multiplication) and 3.40 (addition), so ReLU and the polynomial power operator cost the same order of magnitude per element, consistent
+with Section~\ref{sec:findings}.  Agreement is weaker for $x^3{+}x$ networks (exact on 3/7 of the evaluation networks), where calibration, not cell count, sets the circuit size.
+
+\textbf{Why $\lceil\log_2 C\rceil$ is not always $\logrows$.}  In ezkl's settings the reported row count is half of the assigned cells: the ratio of assigned cells to rows lies between 1.9999 and 2.0000 in all 234 calibrated networks.  The calibrated $\logrows$ is then
+the largest of four resource requirements, not a function of rows alone: $\logrows=\max(\lceil\log_2\text{rows}\rceil,\lceil\log_2\text{const}\rceil,\lceil\log_2\text{lookup span}\rceil,\lceil\log_2\text{range-check span}\rceil)$,
+where \emph{const} is ezkl's \texttt{total\_const\_size} (weights stored as constants: for MLPs it equals the parameter count, median const/parameters 1.0, while for convolutional networks it is 126--363 times larger; we did not investigate why), \emph{lookup span} is the width of the calibrated lookup range and \emph{range-check span} is the largest range-check table.
+The rule reproduces the calibrated $\logrows$ exactly for 72 of 72 networks (Table~\ref{tab:accounting}; ReLU 19/19, $x^2$ 19/19, $x^2{+}x$ 21/21, $x^3{+}x$ 13/13).
+The resource that binds is the row count in 16 networks, the constants in 60, the lookup table in 15 and a range-check table in 12.  This explains the $x^3{+}x$ anomaly: 12 of the 13 dumped $x^3{+}x$ networks have a range check of
+$\pm2^{21}$ (a table of $2^{22}$ entries, with ezkl's calibration selecting the lower input scale $11$), which forces $\logrows=23$ regardless of cell count, and none of the 0 ReLU, $x^2$ or $x^2{+}x$ networks has such a range check, and it explains why parameter-heavy but MAC-light networks are set by their constants rather than their cells.  The rule is an empirical fit to settings we dumped, not a derivation from
+ezkl's source, and our cost model predicts only the cell count (hence only the rows requirement).  $\varepsilon$ in Eq.~\eqref{eq:cost} is reported
 only through these residuals, and we do not claim an exact formula.
 
 \input{tables/costfit}
+\input{tables/accounting}
 
 

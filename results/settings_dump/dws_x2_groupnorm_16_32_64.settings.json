@@ -1,0 +1,109 @@
+{
+ "run_args": {
+  "tolerance": {
+   "val": 0.0,
+   "scale": 1.0
+  },
+  "input_scale": 12,
+  "param_scale": 12,
+  "scale_rebase_multiplier": 10,
+  "lookup_range": [
+   2,
+   -2
+  ],
+  "logrows": 20,
+  "num_inner_cols": 2,
+  "variables": [
+   [
+    "batch_size",
+    1
+   ]
+  ],
+  "input_visibility": "Private",
+  "output_visibility": "Public",
+  "param_visibility": "Fixed",
+  "div_rebasing": true,
+  "rebase_frac_zero_constants": false,
+  "check_mode": "UNSAFE"
+ },
+ "num_rows": 447387,
+ "total_assignments": 894774,
+ "total_const_size": 576593,
+ "total_dynamic_col_size": 0,
+ "num_dynamic_lookups": 0,
+ "num_shuffles": 6144,
+ "total_shuffle_col_size": 24576,
+ "model_instance_shapes": [
+  [
+   1,
+   10
+  ]
+ ],
+ "model_output_scales": [
+  120
+ ],
+ "model_input_scales": [
+  12
+ ],
+ "module_sizes": {
+  "kzg": [],
+  "poseidon": [
+   0,
+   [
+    0
+   ]
+  ]
+ },
+ "required_lookups": [
+  {
+   "Div": {
+    "denom": 1.329228e+36
+   }
+  },
+  {
+   "Rsqrt": {
+    "scale": 1.329228e+36
+   }
+  },
+  {
+   "Div": {
+    "denom": 1024.0
+   }
+  },
+  {
+   "Div": {
+    "denom": 4294967300.0
+   }
+  },
+  {
+   "Div": {
+    "denom": 512.0
+   }
+  },
+  {
+   "Div": {
+    "denom": 4096.0
+   }
+  },
+  {
+   "GreaterThanEqual": {
+    "a": 0.0
+   }
+  },
+  {
+   "Div": {
+    "denom": 64.0
+   }
+  },
+  {
+   "Rsqrt": {
+    "scale": 4.056482e+31
+   }
+  }
+ ],
+ "required_range_checks": [],
+ "check_mode": "UNSAFE",
+ "version": "9.5.0",
+ "num_blinding_factors": null,
+ "timestamp": 1794693898757
+}

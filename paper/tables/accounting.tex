@@ -1,0 +1,19 @@
+\begin{table}[h]
+\centering
+\caption{Test of the four-resource rule $\logrows=\max(\lceil\log_2\text{rows}\rceil,\lceil\log_2\text{const}\rceil,\lceil\log_2\text{lookup span}\rceil,\lceil\log_2\text{range-check span}\rceil)$
+  on ezkl's dumped \texttt{settings.json} for 72 trained networks (a stratified sample, assigned cells below $2.2$M).  The binding resource (ties counted for each) was
+  rows in 16, constants in 60, lookup table in 15 and range-check table in 12 networks.}
+\label{tab:accounting}
+\small
+\begin{tabular}{lrr}
+\toprule
+\textbf{Family} & $n$ & \textbf{rule exact} \\
+\midrule
+ReLU & 19 & 19 \\
+$x^2$ & 19 & 19 \\
+$x^2{+}x$ & 21 & 21 \\
+$x^3{+}x$ & 13 & 13 \\
+\textbf{all} & 72 & 72 \\
+\bottomrule
+\end{tabular}
+\end{table}

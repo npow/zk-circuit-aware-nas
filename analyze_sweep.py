@@ -56,6 +56,8 @@ def load_sweep(d):
         row["top1_sd"] = float(np.std([r["top1"] for r in recs], ddof=1)) if len(recs) > 1 else float("nan")
         row["top1_by_seed"] = {s: r["top1"] for s, r in a["seeds"].items()}
         row["diverged_any"] = any(r.get("diverged") for r in recs)
+        r0_ = a["seeds"].get(0)
+        row["seed0_failed"] = bool(r0_ is not None and (r0_.get("diverged") or r0_.get("top1", 100) < 15))
         # init-time quantities (proxies, cost estimate) exist only on seed-0 records; seed >=1 runs skip them
         r0 = a["seeds"].get(0)
         row["params"] = recs[0].get("params")
@@ -243,6 +245,22 @@ def outcome(pool, sel):
     return max(pool[i]["acc"] for i in sel)
 
 
+MAX_EST = 25
+
+
+def apply_skip_rule(arch, calib):
+    """The rule used to decide which networks to calibrate: skip networks whose seed-0 training failed
+    (diverged or top-1 < 15%) and networks whose estimated logrows exceed MAX_EST.  A few networks that the
+    rule would skip were calibrated in an earlier, alphabetical pass; they are dropped here so every analysis
+    uses one rule.  Returns (kept, dropped)."""
+    kept, dropped = [], []
+    for c in calib:
+        r = arch.get(c["name"])
+        bad = r is None or r["seed0_failed"] or (r.get("zk_logrows_est") or 0) > MAX_EST
+        (dropped if bad else kept).append(c)
+    return kept, dropped
+
+
 def section_D(arch, calib, K=10, splits=300, lams=(0.0, 0.25, 0.5, 1.0, 2.0, 4.0), seed=0):
     out = {}
     cal = {c["name"]: c for c in calib if c.get("logrows") is not None and c.get("total_assignments")}
@@ -265,16 +283,19 @@ def section_D(arch, calib, K=10, splits=300, lams=(0.0, 0.25, 0.5, 1.0, 2.0, 4.0
         oracle = max(b["acc"] for b in pool_all)
         ent["oracle_best_acc"] = oracle
         reg = collections.defaultdict(list)
+        reg_by_lam = collections.defaultdict(list)
         chosen_lams = []
         for _ in range(splits):
             idx = list(range(len(pool_all))); rng.shuffle(idx)
             h = len(idx) // 2
             tune = [pool_all[i] for i in idx[:h]]; test = [pool_all[i] for i in idx[h:]]
             best_lam, best_val = None, -1
-            for lam in lams:
+            for lam in lams:  # ties are broken toward the smaller lambda (lambda=0 is NEAR-only), because of the strict '>'
                 v = outcome(tune, select(tune, "joint", lam, K, rng))
                 if v > best_val + 1e-9:
                     best_val, best_lam = v, lam
+            for lam in lams:  # untuned: regret of each fixed lambda on the evaluation half
+                reg_by_lam[lam].append(max(b["acc"] for b in test) - outcome(test, select(test, "joint", lam, K, rng)))
             chosen_lams.append(best_lam)
             o_test = max(b["acc"] for b in test)
             reg["joint"].append(o_test - outcome(test, select(test, "joint", best_lam, K, rng)))
@@ -289,6 +310,8 @@ def section_D(arch, calib, K=10, splits=300, lams=(0.0, 0.25, 0.5, 1.0, 2.0, 4.0
         ent["joint_vs_near"] = {"win": int((j < nr - 1e-9).sum()), "tie": int((abs(j - nr) <= 1e-9).sum()), "loss": int((j > nr + 1e-9).sum())}
         ent["joint_vs_random"] = {"win": int((j < rd - 1e-9).sum()), "tie": int((abs(j - rd) <= 1e-9).sum()), "loss": int((j > rd + 1e-9).sum())}
         ent["chosen_lambda_counts"] = dict(collections.Counter(chosen_lams))
+        ent["regret_by_lambda_untuned"] = {str(l): float(np.mean(v)) for l, v in reg_by_lam.items()}
+        ent["tie_rule"] = "ties broken toward smaller lambda; lambda=0 is NEAR-only"
         out[f"B<={B}"] = ent
     out["K"] = K; out["splits"] = splits; out["lambda_grid"] = list(lams)
     return out
@@ -354,7 +377,35 @@ def feature_vector(f):
     }
 
 
-def section_E(calib, val_names):
+def cv_metrics(X, y, lr, hand, types, repeats=20, folds=5, seed=0):
+    """Repeated k-fold cross-validation of the NNLS cost model over all calibrated networks."""
+    rng = np.random.default_rng(seed)
+    n = len(y)
+    agg = {"fitted": collections.defaultdict(list), "hand": collections.defaultdict(list)}
+    by_type = collections.defaultdict(lambda: collections.defaultdict(list))
+    for _ in range(repeats):
+        fold = rng.permutation(n) % folds
+        pred = np.zeros(n)
+        for k in range(folds):
+            tr, te = fold != k, fold == k
+            w = 1.0 / y[tr]
+            coef, _ = nnls(X[tr] * w[:, None], np.ones(tr.sum()))
+            pred[te] = X[te] @ coef
+        for name, pr in (("fitted", pred), ("hand", hand)):
+            pl = np.ceil(np.log2(np.maximum(pr, 2))); d = pl - lr
+            agg[name]["exact"].append(float((d == 0).mean())); agg[name]["within1"].append(float((abs(d) <= 1).mean()))
+            agg[name]["rho"].append(float(stats.spearmanr(pl, lr)[0]))
+            for t in set(types):
+                m = np.array([x == t for x in types])
+                by_type[name + "/" + t]["exact"].append(float((d[m] == 0).mean())); by_type[name + "/" + t]["n"] = int(m.sum())
+    out = {"repeats": repeats, "folds": folds, "n": int(n)}
+    for name in agg:
+        out[name] = {k: float(np.mean(v)) for k, v in agg[name].items()}
+    out["by_type"] = {k: {"exact": float(np.mean(v["exact"])), "n": v["n"]} for k, v in by_type.items()}
+    return out
+
+
+def section_E(calib, val_names, arch=None):
     ok = [c for c in calib if c.get("logrows") is not None and c.get("total_assignments") and c.get("features")]
     names = [c["name"] for c in ok]
     fv = [feature_vector(c["features"]) for c in ok]
@@ -388,10 +439,50 @@ def section_E(calib, val_names):
     acts = np.array(acts)
     res["hand_set_eval_by_act"] = {a: metrics(hand, is_val & (acts == a), a) for a in ("relu", "x2", "x2px", "x3px") if (is_val & (acts == a)).sum() > 3}
     res["fitted_eval_by_act"] = {a: metrics(pred, is_val & (acts == a), a) for a in ("relu", "x2", "x2px", "x3px") if (is_val & (acts == a)).sum() > 3}
+    if arch is not None:
+        types = [arch[n]["arch_type"] if n in arch else "?" for n in names]
+        res["cross_validation"] = cv_metrics(X, y, lr, hand, types)
+        res["eval_split_arch_types"] = dict(collections.Counter(t for t, v in zip(types, is_val) if v))
+        res["fit_split_arch_types"] = dict(collections.Counter(t for t, v in zip(types, is_val) if not v))
     # does ceil(log2(assignments)) equal logrows? (accounting check)
     d = np.ceil(np.log2(y)) - lr
     res["assignments_ceil_log2_equals_logrows"] = {a: {"n": int((acts == a).sum()), "equal": int(((d == 0) & (acts == a)).sum())} for a in ("relu", "x2", "x2px", "x3px")}
     return res
+
+
+def section_G(dump_dirs, arch):
+    """Test the four-resource rule  logrows = max(ceil log2 rows, ceil log2 const, ceil log2 lookup span, ceil log2 range-check span)
+    on dumped ezkl settings.json files."""
+    L = lambda x: math.ceil(math.log2(max(x, 1))) if x > 1 else 0
+    recs = {}
+    for d in dump_dirs:
+        for f in glob.glob(f"{d}/*.settings.json"):
+            name = f.split("/")[-1].replace(".settings.json", "")
+            st = json.load(open(f)); ra = st["run_args"]
+            lo, hi = ra["lookup_range"]
+            rcs = st.get("required_range_checks") or []
+            need = {"rows": L(st["num_rows"]), "const": L(st["total_const_size"]),
+                    "lookup": L(hi - lo + 1) if hi > lo else 0,
+                    "range_check": max([L(b - a + 1) for a, b in rcs], default=0)}
+            pred = max(need.values())
+            act = next((a for a in ("x3px", "x2px", "x2", "relu") if f"_{a}_" in name), "?")
+            recs[name] = {"logrows": ra["logrows"], "pred": pred, "need": need, "act": act, "big_rc": need["range_check"] >= 22, "scale": ra.get("input_scale"),
+                          "binding": [k for k, v in need.items() if v == pred], "rows_x2_eq_assign": st["total_assignments"] == 2 * st["num_rows"] or abs(st["total_assignments"] - 2 * st["num_rows"]) <= 2,
+                          "const": st["total_const_size"], "params": (arch.get(name) or {}).get("params")}
+    n = len(recs)
+    out = {"n": n, "exact": sum(r["pred"] == r["logrows"] for r in recs.values()),
+           "by_act": {a: {"n": sum(r["act"] == a for r in recs.values()), "exact": sum(r["act"] == a and r["pred"] == r["logrows"] for r in recs.values())} for a in ("relu", "x2", "x2px", "x3px")},
+           "big_range_check_by_act": {a: sum(r["act"] == a and r["big_rc"] for r in recs.values()) for a in ("relu", "x2", "x2px", "x3px")},
+           "binding_counts": dict(collections.Counter(b for r in recs.values() for b in r["binding"])),
+           "pred_minus_logrows": dict(collections.Counter(r["pred"] - r["logrows"] for r in recs.values())),
+           "rows_equal_half_assignments": sum(r["rows_x2_eq_assign"] for r in recs.values()),
+           "mismatches": [{"name": k, "logrows": r["logrows"], "pred": r["pred"], "need": r["need"]} for k, r in recs.items() if r["pred"] != r["logrows"]][:20]}
+    out["const_over_params"] = {}
+    for label, pred in (("mlp", lambda k: k.startswith("mlp")), ("conv", lambda k: not k.startswith("mlp"))):
+        ratios = [r["const"] / r["params"] for k, r in recs.items() if r["params"] and pred(k)]
+        if ratios:
+            out["const_over_params"][label] = {"median": float(np.median(ratios)), "min": float(np.min(ratios)), "max": float(np.max(ratios)), "n": len(ratios)}
+    return out
 
 
 def main():
@@ -399,6 +490,7 @@ def main():
     ap.add_argument("--sweep", required=True)
     ap.add_argument("--calib", default=None)
     ap.add_argument("--val73", default="results/proxy_vs_ezkl.json")
+    ap.add_argument("--settings", nargs="*", default=[], help="dirs of dumped ezkl settings.json files")
     ap.add_argument("--out", default="results/sweep_summary.json")
     a = ap.parse_args()
     arch = load_sweep(a.sweep)
@@ -415,11 +507,19 @@ def main():
         calib = [json.loads(l) for l in open(a.calib) if l.strip()]
         out["n_calibration_records"] = len(calib)
         out["n_calibration_failed"] = sum(1 for c in calib if c.get("logrows") is None)
+        calib_all = calib
+        calib, dropped = apply_skip_rule(arch, calib_all)
+        out["calibration_rule"] = {"records": len(calib_all), "dropped_by_uniform_rule": len(dropped), "used": len(calib),
+                                   "failed_inside_ezkl": sum(1 for c in calib if c.get("logrows") is None),
+                                   "pool_members_failed_or_est_gt_25": 0}
+        json.dump(sorted(c["name"] for c in dropped), open("results/calibration_dropped_by_rule.json", "w"), indent=1)
         out["D_search"] = section_D(arch, calib)
         out["D_search_K5"] = section_D(arch, calib, K=5)
         out["D2_estimated_budget"] = section_D2(arch, calib)
         val = {r["name"] for r in json.load(open(a.val73))}
-        out["E_cost_model"] = section_E(calib, val)
+        out["E_cost_model"] = section_E(calib, val, arch)
+    if a.settings:
+        out["G_logrows_rule"] = section_G(a.settings, arch)
     json.dump(out, open(a.out, "w"), indent=1, default=float)
     print(f"{len(arch)} architectures; wrote {a.out}")
 

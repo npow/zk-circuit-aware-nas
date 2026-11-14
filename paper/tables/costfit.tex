@@ -1,8 +1,8 @@
 \begin{table}[h]
 \centering
 \caption{Cost model of Eq.~\eqref{eq:cost} against ezkl-calibrated $\logrows$ on \emph{trained} networks with real inputs.
-  Coefficients are fitted by non-negative least squares (relative-error weighting) on 187 networks and evaluated on the
-  56 networks of the earlier validation set, which are excluded from the fit.  ``exact'' and ``within 1'' count
+  Coefficients are fitted by non-negative least squares (relative-error weighting) on 180 networks and evaluated on the
+  54 networks of the earlier validation set, which are excluded from the fit.  ``exact'' and ``within 1'' count
   networks whose predicted $\lceil\log_2 C\rceil$ equals or is within one of the calibrated $\logrows$; $\rho$ is Spearman between predicted and
   calibrated $\logrows$; RMSE is in $\log_2$ of assigned cells.}
 \label{tab:costfit}
@@ -11,16 +11,23 @@
 \toprule
  & $n$ & \textbf{exact} & \textbf{within 1} & $\rho$ & \textbf{RMSE} \\
 \midrule
-Hand-set proxy, evaluation split & 56 & 39 & 52 & 0.82 & 0.18 \\
-Fitted (NNLS), evaluation split & 56 & 43 & 53 & 0.86 & 0.11 \\
-Fitted (NNLS), fit split & 187 & 132 & 178 & 0.90 & 0.11 \\
-\quad fitted, eval, ReLU & 21 & 18 & 21 & 0.96 & 0.10 \\
-\quad fitted, eval, $x^2$ & 11 & 10 & 11 & 0.98 & 0.07 \\
-\quad fitted, eval, $x^2{+}x$ & 17 & 12 & 17 & 0.95 & 0.14 \\
+Hand-set proxy, evaluation split & 54 & 37 & 50 & 0.80 & 0.19 \\
+Fitted (NNLS), evaluation split & 54 & 39 & 51 & 0.84 & 0.11 \\
+Fitted (NNLS), fit split & 180 & 125 & 171 & 0.89 & 0.11 \\
+\quad fitted, eval, ReLU & 20 & 16 & 20 & 0.94 & 0.10 \\
+\quad fitted, eval, $x^2$ & 11 & 9 & 11 & 0.96 & 0.07 \\
+\quad fitted, eval, $x^2{+}x$ & 16 & 11 & 16 & 0.94 & 0.15 \\
 \quad fitted, eval, $x^3{+}x$ & 7 & 3 & 4 & 0.12 & 0.09 \\
+5-fold CV, all 234 networks: hand-set & 234 & 68\% & 93\% & 0.87 & -- \\
+5-fold CV, all 234 networks: fitted & 234 & 70\% & 95\% & 0.89 & -- \\
+\quad CV fitted, resnet & 16 & 100\% & -- & -- & -- \\
+\quad CV fitted, dws-resnet & 66 & 66\% & -- & -- & -- \\
+\quad CV fitted, mlp & 52 & 83\% & -- & -- & -- \\
+\quad CV fitted, cnn & 53 & 76\% & -- & -- & -- \\
+\quad CV fitted, dws-cnn & 47 & 44\% & -- & -- & -- \\
 \bottomrule
 \end{tabular}
 
 \smallskip
-{\scriptsize Fitted coefficients (cells per MAC / per node / per element): macs\_conv\_standard=0.934, macs\_conv\_depthwise=1.11, macs\_gemm=0.992, n\_matmul\_conv\_nodes=0, elem\_relu=15, elem\_pow=12.4, elem\_mul=2.21, elem\_add\_sub=3.47, elem\_norm=5.55, elem\_pool\_reduce=0.}
+{\scriptsize Fitted coefficients (cells per MAC / per node / per element): macs\_conv\_standard=0.941, macs\_conv\_depthwise=1.11, macs\_gemm=0.992, n\_matmul\_conv\_nodes=0, elem\_relu=14.8, elem\_pow=12.3, elem\_mul=2.28, elem\_add\_sub=3.4, elem\_norm=5.57, elem\_pool\_reduce=0.}
 \end{table}

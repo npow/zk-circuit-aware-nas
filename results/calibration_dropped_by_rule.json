@@ -1,0 +1,23 @@
+[
+ "cnn_relu_groupnorm_64_128_256",
+ "cnn_relu_layernorm_64_128_256",
+ "cnn_relu_none_64_128_256",
+ "cnn_x2_groupnorm_16_32_64_128",
+ "cnn_x2_groupnorm_64_128_256",
+ "cnn_x2_layernorm_64_128_256",
+ "cnn_x2_none_64_128_256",
+ "cnn_x2px_groupnorm_16_32_64_128",
+ "cnn_x2px_groupnorm_64_128_256",
+ "cnn_x2px_layernorm_64_128_256",
+ "cnn_x2px_none_64_128_256",
+ "cnn_x3px_groupnorm_16_32_64",
+ "cnn_x3px_groupnorm_16_32_64_128",
+ "cnn_x3px_groupnorm_32_64",
+ "cnn_x3px_groupnorm_32_64_128",
+ "cnn_x3px_groupnorm_64_128_256",
+ "cnn_x3px_layernorm_64_128_256",
+ "cnn_x3px_none_16_32_64_128",
+ "cnn_x3px_none_64_128_256",
+ "dws_x2_groupnorm_32_64_128_256",
+ "dws_x2_groupnorm_64_128_256"
+]

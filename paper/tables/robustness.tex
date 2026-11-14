@@ -1,0 +1,39 @@
+\begin{table}[h]
+\centering
+\caption{Three-seed (42, 43, 44) test top-1 (mean $\pm$ sample SD) after 30 and after 100 epochs (a fresh cosine schedule for each budget) for the 26 architectures of the earlier validation, rerun with
+  \texttt{sweep\_gpu.py}; per-run outputs are released.  Runs that diverged are included at their (chance-level) accuracy.}
+\label{tab:robustness}
+\scriptsize
+\begin{tabular}{lrr}
+\toprule
+\textbf{Architecture} & \textbf{30 epochs} & \textbf{100 epochs} \\
+\midrule
+cnn\_relu\_none\_16\_32\_64 & $77.80\mathbin{\pm}0.38$ & $80.81\mathbin{\pm}0.21$ \\
+cnn\_relu\_none\_16\_32\_64\_128 & $82.65\mathbin{\pm}0.54$ & $85.18\mathbin{\pm}0.14$ \\
+cnn\_relu\_none\_64\_128\_256 & $84.78\mathbin{\pm}0.30$ & $87.08\mathbin{\pm}0.25$ \\
+cnn\_x2\_none\_16\_32\_64 & $52.49\mathbin{\pm}0.77$ & $59.88\mathbin{\pm}0.34$ \\
+cnn\_x2\_none\_16\_32\_64\_128 & $44.09\mathbin{\pm}0.23$ & $56.82\mathbin{\pm}0.21$ \\
+cnn\_x2px\_none\_16\_32\_64 & $64.64\mathbin{\pm}0.39$ & $70.69\mathbin{\pm}0.03$ \\
+cnn\_x2px\_none\_16\_32\_64\_128 & $70.85\mathbin{\pm}0.43$ & $77.32\mathbin{\pm}0.38$ \\
+cnn\_x3px\_none\_16\_32\_64 & $50.26\mathbin{\pm}0.74$ & $58.86\mathbin{\pm}0.44$ \\
+cnn\_x3px\_none\_16\_32\_64\_128 & $48.46\mathbin{\pm}6.19$ & $65.42\mathbin{\pm}1.22$ \\
+dws\_relu\_none\_16\_32\_64 & $65.83\mathbin{\pm}0.66$ & $68.63\mathbin{\pm}0.62$ \\
+dws\_relu\_none\_32\_64\_128 & $72.03\mathbin{\pm}0.52$ & $76.88\mathbin{\pm}0.82$ \\
+dws\_relu\_none\_32\_64\_128\_256 & $75.69\mathbin{\pm}0.48$ & $81.03\mathbin{\pm}0.28$ \\
+dws\_x2\_none\_16\_32\_64 & $27.18\mathbin{\pm}15.08$ & $32.25\mathbin{\pm}19.29$ \\
+dws\_x2\_none\_32\_64\_128\_256 & $18.70\mathbin{\pm}15.06$ & $22.47\mathbin{\pm}21.60$ \\
+dws\_x2px\_none\_16\_32\_64 & $51.26\mathbin{\pm}1.04$ & $57.94\mathbin{\pm}0.35$ \\
+dws\_x2px\_none\_32\_64\_128\_256 & $59.18\mathbin{\pm}0.64$ & $67.55\mathbin{\pm}0.83$ \\
+dws\_x3px\_none\_16\_32\_64 & $41.28\mathbin{\pm}1.67$ & $49.34\mathbin{\pm}1.15$ \\
+dws\_x3px\_none\_32\_64\_128\_256 & $43.95\mathbin{\pm}0.62$ & $54.70\mathbin{\pm}0.42$ \\
+mlp\_relu\_layernorm\_128x64x32 & $56.06\mathbin{\pm}0.07$ & $59.16\mathbin{\pm}0.28$ \\
+mlp\_relu\_none\_128x64x32 & $52.84\mathbin{\pm}0.18$ & $56.28\mathbin{\pm}0.24$ \\
+mlp\_x2\_layernorm\_128x64x32 & $55.81\mathbin{\pm}0.52$ & $58.63\mathbin{\pm}0.58$ \\
+mlp\_x2\_none\_128x64x32 & $47.89\mathbin{\pm}0.65$ & $57.62\mathbin{\pm}0.44$ \\
+mlp\_x2px\_layernorm\_128x64x32 & $56.89\mathbin{\pm}0.48$ & $60.29\mathbin{\pm}0.51$ \\
+mlp\_x2px\_none\_128x64x32 & $54.32\mathbin{\pm}0.72$ & $59.38\mathbin{\pm}0.35$ \\
+mlp\_x3px\_layernorm\_128x64x32 & $10.00\mathbin{\pm}0.00$ & $10.00\mathbin{\pm}0.00$ \\
+mlp\_x3px\_none\_128x64x32 & $38.89\mathbin{\pm}0.15$ & $48.89\mathbin{\pm}0.56$ \\
+\bottomrule
+\end{tabular}
+\end{table}

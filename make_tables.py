@@ -38,7 +38,9 @@ for p, label in names.items():
             continue
         star = r"^{*}" if e.get("p_holm", 1) < 0.05 else ""
         ci = e["ci95"]
-        cells.append(rf"${e['rho']:+.2f}{star}$ {{\scriptsize[{ci[0]:+.2f},{ci[1]:+.2f}]}}")
+        fam_n = A.get(f"{f}/near", {}).get("n", e["n"])
+        nn = rf" {{\scriptsize($n{{=}}{e['n']}$)}}" if e["n"] != fam_n else ""
+        cells.append(rf"${e['rho']:+.2f}{star}$ {{\scriptsize[{ci[0]:+.2f},{ci[1]:+.2f}]}}{nn}")
     rows.append(f"{label} & " + " & ".join(cells) + r" \\")
 hdr = " & ".join([r"\textbf{Proxy}"] + [rf"\textbf{{{l}}} ($n{{=}}{n_by.get(f, 0)}$)" for f, l in fams])
 OUT.append(r"""\begin{table}[h]
@@ -101,7 +103,8 @@ if A2:
                 continue
             star = r"^{*}" if e.get("p_holm", 1) < 0.05 else ""
             ci = e["ci95"]
-            cells.append(rf"${e['rho']:+.2f}{star}$ {{\scriptsize[{ci[0]:+.2f},{ci[1]:+.2f}]}}")
+            fam_n = A2.get(f"{f}/near", {}).get("n", e["n"]); nn = rf" {{\scriptsize($n{{=}}{e['n']}$)}}" if e["n"] != fam_n else ""
+            cells.append(rf"${e['rho']:+.2f}{star}$ {{\scriptsize[{ci[0]:+.2f},{ci[1]:+.2f}]}}{nn}")
         rows.append(f"{label} & " + " & ".join(cells) + r" \\")
     nf = S["n_failed_by_act"]
     hdr2 = " & ".join([r"\textbf{Proxy}"] + [rf"\textbf{{{l}}} ($n{{=}}{A2.get(f+'/near', {}).get('n', '?')}$)" for f, l in fams])
@@ -134,7 +137,8 @@ if A3:
                 continue
             star = r"^{*}" if e.get("p_holm", 1) < 0.05 else ""
             ci = e["ci95"]
-            cells.append(rf"${e['rho']:+.2f}{star}$ {{\scriptsize[{ci[0]:+.2f},{ci[1]:+.2f}]}}")
+            fam_n = A3.get(f"{f}/near", {}).get("n", e["n"]); nn = rf" {{\scriptsize($n{{=}}{e['n']}$)}}" if e["n"] != fam_n else ""
+            cells.append(rf"${e['rho']:+.2f}{star}$ {{\scriptsize[{ci[0]:+.2f},{ci[1]:+.2f}]}}{nn}")
         rows.append(f"{label} & " + " & ".join(cells) + r" \\")
     hdr3 = " & ".join([r"\textbf{Proxy}"] + [rf"\textbf{{{l}}} ($n{{=}}{A3.get(f+'/near', {}).get('n', '?')}$)" for f, l in fams])
     OUT.append(r"""\begin{table}[h]
@@ -209,6 +213,69 @@ if D:
 \end{table}
 """)
 
+# ---------------- untuned regret per lambda ----------------
+if D:
+    lams = D["lambda_grid"]
+    rows = []
+    for B_ in (20, 21, 22, 23):
+        e = D.get(f"B<={B_}", {})
+        if "regret_by_lambda_untuned" not in e:
+            continue
+        r_ = e["regret_by_lambda_untuned"]
+        cells = " & ".join(f"{r_[str(l)]:.2f}" for l in lams)
+        rows.append(rf"$\le{B_}$ & {e['pool']} & {cells} & {e['joint']['mean_regret']:.2f} \\")
+    D5_ = S.get("D_search_K5")
+    rows5 = []
+    for B_ in (20, 21, 22, 23):
+        e = D5_.get(f"B<={B_}", {}) if D5_ else {}
+        if "regret_by_lambda_untuned" in e:
+            r_ = e["regret_by_lambda_untuned"]
+            rows5.append(rf"$\le{B_}$ & {e['pool']} & " + " & ".join(f"{r_[str(l)]:.2f}" for l in lams) + rf" & {e['joint']['mean_regret']:.2f} \\")
+    OUT.append(r"""\begin{table}[h]
+\centering
+\caption{Untuned test of the joint proxy: mean regret (accuracy points) on the evaluation halves for each \emph{fixed} $\lambda$ (columns), averaged over """ + str(D["splits"]) + r""" splits;
+  $\lambda=0$ is NEAR-only.  The last column is the tuned joint proxy, whose tuning breaks ties toward the smaller $\lambda$.  Upper block $K=""" + str(D["K"]) + r"""$, lower block $K=""" + str(D5_["K"]) + r"""$.}
+\label{tab:lambda}
+\small
+\begin{tabular}{rr""" + "r" * len(lams) + r"""r}
+\toprule
+$B$ & pool & """ + " & ".join(rf"$\lambda{{=}}{l:g}$" for l in lams) + r""" & tuned \\
+\midrule
+""" + "\n".join(rows) + r"""
+\midrule
+""" + "\n".join(rows5) + r"""
+\bottomrule
+\end{tabular}
+\end{table}
+""")
+
+# ---------------- logrows accounting rule ----------------
+G = S.get("G_logrows_rule")
+if G:
+    rows = []
+    for a, lab in (("relu", "ReLU"), ("x2", r"$x^2$"), ("x2px", r"$x^2{+}x$"), ("x3px", r"$x^3{+}x$")):
+        e = G["by_act"][a]
+        if e["n"]:
+            rows.append(rf"{lab} & {e['n']} & {e['exact']} \\")
+    rows.append(rf"\textbf{{all}} & {G['n']} & {G['exact']} \\")
+    bc = G["binding_counts"]
+    OUT.append(r"""\begin{table}[h]
+\centering
+\caption{Test of the four-resource rule $\logrows=\max(\lceil\log_2\text{rows}\rceil,\lceil\log_2\text{const}\rceil,\lceil\log_2\text{lookup span}\rceil,\lceil\log_2\text{range-check span}\rceil)$
+  on ezkl's dumped \texttt{settings.json} for """ + str(G["n"]) + r""" trained networks (a stratified sample, assigned cells below $2.2$M).  The binding resource (ties counted for each) was
+  rows in """ + str(bc.get("rows", 0)) + r""", constants in """ + str(bc.get("const", 0)) + r""", lookup table in """ + str(bc.get("lookup", 0)) + r""" and range-check table in """ + str(bc.get("range_check", 0)) + r""" networks.}
+\label{tab:accounting}
+\small
+\begin{tabular}{lrr}
+\toprule
+\textbf{Family} & $n$ & \textbf{rule exact} \\
+\midrule
+""" + "\n".join(rows) + r"""
+\bottomrule
+\end{tabular}
+\end{table}
+""")
+
 # ---------------- estimated-budget filtering ----------------
 D2 = S.get("D2_estimated_budget")
 if D2:
@@ -246,6 +313,14 @@ if E:
     for a, lab in (("relu", "ReLU"), ("x2", r"$x^2$"), ("x2px", r"$x^2{+}x$"), ("x3px", r"$x^3{+}x$")):
         if a in E.get("fitted_eval_by_act", {}):
             rows.append(mrow(rf"\quad fitted, eval, {lab}", E["fitted_eval_by_act"][a]))
+    cv = E.get("cross_validation")
+    if cv:
+        rows.append(rf"5-fold CV, all {cv['n']} networks: hand-set & {cv['n']} & {100*cv['hand']['exact']:.0f}\% & {100*cv['hand']['within1']:.0f}\% & {cv['hand']['rho']:.2f} & -- \\")
+        rows.append(rf"5-fold CV, all {cv['n']} networks: fitted & {cv['n']} & {100*cv['fitted']['exact']:.0f}\% & {100*cv['fitted']['within1']:.0f}\% & {cv['fitted']['rho']:.2f} & -- \\")
+        for t in ("resnet", "dws_resnet", "mlp", "cnn", "dws_cnn"):
+            k = "fitted/" + t
+            if k in cv["by_type"]:
+                rows.append(rf"\quad CV fitted, {t.replace('_', '-')} & {cv['by_type'][k]['n']} & {100*cv['by_type'][k]['exact']:.0f}\% & -- & -- & -- \\")
     coefs = ", ".join(rf"{tex(k)}={v:.3g}" for k, v in E["coef"].items())
     OUT.append(r"""\begin{table}[h]
 \centering
@@ -298,6 +373,32 @@ try:
 \begin{tabular}{lrrrrrrr}
 \toprule
 \textbf{Architecture} & \textbf{top-1 (2 seeds)} & $\logrows$ & \textbf{mock} & \textbf{prove} & \textbf{verify} & \textbf{proof KB} & \textbf{q-agree} \\
+\midrule
+""" + "\n".join(rows) + r"""
+\bottomrule
+\end{tabular}
+\end{table}
+""")
+except FileNotFoundError:
+    pass
+
+# ---------------- multi-seed validation (released rerun) ----------------
+try:
+    M = json.load(open("results/multiseed_summary.json"))
+    rows = []
+    for n, e in M["per_arch"].items():
+        def f_(x):
+            return "--" if x["mean"] is None else (rf"${x['mean']:.2f}\mathbin{{\pm}}{x['sd']:.2f}$" if x["sd"] is not None else f"${x['mean']:.2f}$")
+        rows.append(rf"{tex(n)} & {f_(e['30'] if '30' in e else e[30])} & {f_(e['100'] if '100' in e else e[100])} \\")
+    OUT.append(r"""\begin{table}[h]
+\centering
+\caption{Three-seed (42, 43, 44) test top-1 (mean $\pm$ sample SD) after 30 and after 100 epochs (a fresh cosine schedule for each budget) for the """ + str(M["n_archs"]) + r""" architectures of the earlier validation, rerun with
+  \texttt{sweep\_gpu.py}; per-run outputs are released.  Runs that diverged are included at their (chance-level) accuracy.}
+\label{tab:robustness}
+\scriptsize
+\begin{tabular}{lrr}
+\toprule
+\textbf{Architecture} & \textbf{30 epochs} & \textbf{100 epochs} \\
 \midrule
 """ + "\n".join(rows) + r"""
 \bottomrule
