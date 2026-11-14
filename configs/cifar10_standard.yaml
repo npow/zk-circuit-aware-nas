@@ -1,0 +1,38 @@
+benchmark:
+  name: "cifar10_standard"
+  output_dir: "./results"
+  seed: 42
+  num_seeds: 1
+  data_dir: ~/.zkml_bench/data
+
+datasets:
+  - name: cifar10
+
+models:
+  - name: mlp_small
+  - name: mlp_large
+  - name: lenet5
+  - name: resnet20
+  - name: vgg11_small
+  - name: mlp_poly
+  - name: lenet5_poly
+  - name: resnet20_poly
+  - name: resnet20_relu_bn_free
+
+training:
+  epochs: 200
+  batch_size: 512
+  lr: 0.1
+  momentum: 0.9
+  weight_decay: 0.0005
+  device: auto
+
+zk:
+  proxy_only: true
+  ezkl_timeout_setup: 600
+  ezkl_timeout_prove: 300
+  ezkl_calibration_samples: 64
+
+output:
+  formats: [json, csv, plot, markdown]
+  plot_log_scale_x: true

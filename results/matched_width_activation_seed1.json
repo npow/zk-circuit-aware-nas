@@ -1,0 +1,342 @@
+[
+ {
+  "name": "mlp_128x64x32_relu",
+  "act": "relu",
+  "skeleton": "mlp_128x64x32",
+  "error": null,
+  "seed": 1,
+  "clamp": "n/a",
+  "logrows": 19,
+  "num_rows": 203463,
+  "total_assignments": 406927,
+  "total_const_size": 402994,
+  "input_scale": 13,
+  "lookup_range": [
+   -32588,
+   24256
+  ]
+ },
+ {
+  "name": "mlp_128x64x32_x2",
+  "act": "x2",
+  "skeleton": "mlp_128x64x32",
+  "error": null,
+  "seed": 1,
+  "clamp": "per_activation",
+  "logrows": 19,
+  "num_rows": 203912,
+  "total_assignments": 407825,
+  "total_const_size": 403221,
+  "input_scale": 13,
+  "lookup_range": [
+   0,
+   0
+  ]
+ },
+ {
+  "name": "mlp_128x64x32_x2px",
+  "act": "x2px",
+  "skeleton": "mlp_128x64x32",
+  "error": null,
+  "seed": 1,
+  "clamp": "per_activation",
+  "logrows": 19,
+  "num_rows": 204024,
+  "total_assignments": 408049,
+  "total_const_size": 403221,
+  "input_scale": 13,
+  "lookup_range": [
+   0,
+   0
+  ]
+ },
+ {
+  "name": "mlp_128x64x32_x3px",
+  "act": "x3px",
+  "skeleton": "mlp_128x64x32",
+  "error": null,
+  "seed": 1,
+  "clamp": "per_activation",
+  "logrows": 23,
+  "num_rows": 202175,
+  "total_assignments": 404351,
+  "total_const_size": 399310,
+  "input_scale": 11,
+  "lookup_range": [
+   0,
+   0
+  ]
+ },
+ {
+  "name": "mlp_256x128_relu",
+  "act": "relu",
+  "skeleton": "mlp_256x128",
+  "error": null,
+  "seed": 1,
+  "clamp": "n/a",
+  "logrows": 20,
+  "num_rows": 411662,
+  "total_assignments": 823325,
+  "total_const_size": 818836,
+  "input_scale": 13,
+  "lookup_range": [
+   -30236,
+   25496
+  ]
+ },
+ {
+  "name": "mlp_256x128_x2",
+  "act": "x2",
+  "skeleton": "mlp_256x128",
+  "error": null,
+  "seed": 1,
+  "clamp": "per_activation",
+  "logrows": 20,
+  "num_rows": 412432,
+  "total_assignments": 824865,
+  "total_const_size": 819222,
+  "input_scale": 13,
+  "lookup_range": [
+   0,
+   0
+  ]
+ },
+ {
+  "name": "mlp_256x128_x2px",
+  "act": "x2px",
+  "skeleton": "mlp_256x128",
+  "error": null,
+  "seed": 1,
+  "clamp": "per_activation",
+  "logrows": 20,
+  "num_rows": 412624,
+  "total_assignments": 825249,
+  "total_const_size": 819222,
+  "input_scale": 13,
+  "lookup_range": [
+   0,
+   0
+  ]
+ },
+ {
+  "name": "mlp_256x128_x3px",
+  "act": "x3px",
+  "skeleton": "mlp_256x128",
+  "error": null,
+  "seed": 1,
+  "clamp": "per_activation",
+  "logrows": 23,
+  "num_rows": 408826,
+  "total_assignments": 817653,
+  "total_const_size": 811268,
+  "input_scale": 11,
+  "lookup_range": [
+   0,
+   0
+  ]
+ },
+ {
+  "name": "mlp_512x256_relu",
+  "act": "relu",
+  "skeleton": "mlp_512x256",
+  "error": null,
+  "seed": 1,
+  "clamp": "n/a",
+  "logrows": 21,
+  "num_rows": 854495,
+  "total_assignments": 1708991,
+  "total_const_size": 1703171,
+  "input_scale": 13,
+  "lookup_range": [
+   -31212,
+   30260
+  ]
+ },
+ {
+  "name": "mlp_512x256_x2",
+  "act": "x2",
+  "skeleton": "mlp_512x256",
+  "error": null,
+  "seed": 1,
+  "clamp": "per_activation",
+  "logrows": 21,
+  "num_rows": 856032,
+  "total_assignments": 1712065,
+  "total_const_size": 1703941,
+  "input_scale": 13,
+  "lookup_range": [
+   0,
+   0
+  ]
+ },
+ {
+  "name": "mlp_512x256_x2px",
+  "act": "x2px",
+  "skeleton": "mlp_512x256",
+  "error": null,
+  "seed": 1,
+  "clamp": "per_activation",
+  "logrows": 21,
+  "num_rows": 856416,
+  "total_assignments": 1712833,
+  "total_const_size": 1703941,
+  "input_scale": 13,
+  "lookup_range": [
+   0,
+   0
+  ]
+ },
+ {
+  "name": "mlp_512x256_x3px",
+  "act": "x3px",
+  "skeleton": "mlp_512x256",
+  "error": null,
+  "seed": 1,
+  "clamp": "per_activation",
+  "logrows": 23,
+  "num_rows": 848648,
+  "total_assignments": 1697297,
+  "total_const_size": 1687662,
+  "input_scale": 11,
+  "lookup_range": [
+   0,
+   0
+  ]
+ },
+ {
+  "name": "cnn_16_32_relu",
+  "act": "relu",
+  "skeleton": "cnn_16_32",
+  "error": null,
+  "seed": 1,
+  "clamp": "n/a",
+  "logrows": 21,
+  "num_rows": 866975,
+  "total_assignments": 1733937,
+  "total_const_size": 1611865,
+  "input_scale": 13,
+  "lookup_range": [
+   -39610,
+   47404
+  ]
+ },
+ {
+  "name": "cnn_16_32_x2",
+  "act": "x2",
+  "skeleton": "cnn_16_32",
+  "error": null,
+  "seed": 1,
+  "clamp": "per_activation",
+  "logrows": 21,
+  "num_rows": 916113,
+  "total_assignments": 1832227,
+  "total_const_size": 1636443,
+  "input_scale": 13,
+  "lookup_range": [
+   0,
+   113016
+  ]
+ },
+ {
+  "name": "cnn_16_32_x2px",
+  "act": "x2px",
+  "skeleton": "cnn_16_32",
+  "error": null,
+  "seed": 1,
+  "clamp": "per_activation",
+  "logrows": 21,
+  "num_rows": 928401,
+  "total_assignments": 1856803,
+  "total_const_size": 1636443,
+  "input_scale": 13,
+  "lookup_range": [
+   0,
+   147788
+  ]
+ },
+ {
+  "name": "cnn_16_32_x3px",
+  "act": "x3px",
+  "skeleton": "cnn_16_32",
+  "error": null,
+  "seed": 1,
+  "clamp": "per_activation",
+  "logrows": 23,
+  "num_rows": 939999,
+  "total_assignments": 1879999,
+  "total_const_size": 1636040,
+  "input_scale": 11,
+  "lookup_range": [
+   0,
+   97620
+  ]
+ },
+ {
+  "name": "cnn_16_32_64_relu",
+  "act": "relu",
+  "skeleton": "cnn_16_32_64",
+  "error": null,
+  "seed": 1,
+  "clamp": "n/a",
+  "logrows": 22,
+  "num_rows": 1397562,
+  "total_assignments": 2795111,
+  "total_const_size": 2649539,
+  "input_scale": 13,
+  "lookup_range": [
+   -39292,
+   37290
+  ]
+ },
+ {
+  "name": "cnn_16_32_64_x2",
+  "act": "x2",
+  "skeleton": "cnn_16_32_64",
+  "error": null,
+  "seed": 1,
+  "clamp": "per_activation",
+  "logrows": 22,
+  "num_rows": 1454893,
+  "total_assignments": 2909787,
+  "total_const_size": 2678214,
+  "input_scale": 13,
+  "lookup_range": [
+   0,
+   82096
+  ]
+ },
+ {
+  "name": "cnn_16_32_64_x2px",
+  "act": "x2px",
+  "skeleton": "cnn_16_32_64",
+  "error": null,
+  "seed": 1,
+  "clamp": "per_activation",
+  "logrows": 22,
+  "num_rows": 1469229,
+  "total_assignments": 2938459,
+  "total_const_size": 2678214,
+  "input_scale": 13,
+  "lookup_range": [
+   0,
+   118564
+  ]
+ },
+ {
+  "name": "cnn_16_32_64_x3px",
+  "act": "x3px",
+  "skeleton": "cnn_16_32_64",
+  "error": null,
+  "seed": 1,
+  "clamp": "per_activation",
+  "logrows": 23,
+  "num_rows": 1481524,
+  "total_assignments": 2963049,
+  "total_const_size": 2675860,
+  "input_scale": 11,
+  "lookup_range": [
+   0,
+   347460
+  ]
+ }
+]

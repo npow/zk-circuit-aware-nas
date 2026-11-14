@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "experiment": "zk-circuit-aware-nas-publication-validation",
+  "completed_at": "2026-08-30T11:10:43.524597+00:00",
+  "source_git_sha": "a48f48c90d36bfd2405be05bbdc086e5c40c933f",
+  "artifact": {
+    "repository": "[redacted private dataset]",
+    "repository_type": "private_huggingface_dataset",
+    "revision": "bbe914d1930bb4e169e2c0223b5270f48be1b982",
+    "path": "cifar10-publication-core-20260830/results.json",
+    "sha256": "46ca35d3b8ece06c0e9ed5e20c86adbc844f91cc06d239668b9f4e66d5b58515",
+    "runner_sha256": "40be564f754dfe61b1be6d97081c7de801300f90c55f2ab7d6c07a62331ecabe"
+  },
+  "protocol": {
+    "dataset": "cifar10",
+    "architecture_count": 26,
+    "seeds": [42, 43, 44],
+    "epoch_budgets": [30, 100],
+    "schedules": "fresh CosineAnnealingLR schedule for each epoch budget",
+    "hardware": "NVIDIA A10G 24 GB",
+    "planned_runs": 156,
+    "complete_runs": 154,
+    "diverged_runs": 2
+  },
+  "rank_stability": {
+    "architecture_mean_spearman_rho": 0.9316005471956225,
+    "architecture_count": 26,
+    "paired_run_spearman_rho": 0.9411169048276519,
+    "successful_pair_count": 77,
+    "seed_spearman_rho": {
+      "42": 0.9336525307797537,
+      "43": 0.9644322845417237,
+      "44": 0.9292035398230089
+    },
+    "mean_paired_accuracy_gain_percentage_points": 5.883376623376623
+  },
+  "central_architectures": [
+    {
+      "name": "mlp_x2px_none_128x64x32",
+      "original_30_top1": 51.1,
+      "epoch_30": {"n": 3, "mean_top1": 50.67, "sample_sd_top1": 0.52},
+      "epoch_100": {"n": 3, "mean_top1": 55.67, "sample_sd_top1": 0.32}
+    },
+    {
+      "name": "mlp_x2px_layernorm_128x64x32",
+      "original_30_top1": 52.0,
+      "epoch_30": {"n": 3, "mean_top1": 50.87, "sample_sd_top1": 1.16},
+      "epoch_100": {"n": 3, "mean_top1": 54.10, "sample_sd_top1": 1.77}
+    },
+    {
+      "name": "dws_relu_none_16_32_64",
+      "original_30_top1": 62.9,
+      "epoch_30": {"n": 3, "mean_top1": 64.10, "sample_sd_top1": 0.52},
+      "epoch_100": {"n": 3, "mean_top1": 67.52, "sample_sd_top1": 1.12}
+    },
+    {
+      "name": "dws_relu_none_32_64_128",
+      "original_30_top1": 69.3,
+      "epoch_30": {"n": 3, "mean_top1": 70.48, "sample_sd_top1": 1.30},
+      "epoch_100": {"n": 3, "mean_top1": 75.70, "sample_sd_top1": 0.71}
+    },
+    {
+      "name": "dws_relu_none_32_64_128_256",
+      "original_30_top1": 75.0,
+      "epoch_30": {"n": 3, "mean_top1": 74.73, "sample_sd_top1": 1.61},
+      "epoch_100": {"n": 3, "mean_top1": 79.96, "sample_sd_top1": 0.40}
+    },
+    {
+      "name": "cnn_relu_none_16_32_64",
+      "original_30_top1": 77.1,
+      "epoch_30": {"n": 3, "mean_top1": 76.98, "sample_sd_top1": 0.72},
+      "epoch_100": {"n": 3, "mean_top1": 79.80, "sample_sd_top1": 0.46}
+    },
+    {
+      "name": "cnn_relu_none_16_32_64_128",
+      "original_30_top1": 81.6,
+      "epoch_30": {"n": 3, "mean_top1": 81.31, "sample_sd_top1": 0.53},
+      "epoch_100": {"n": 3, "mean_top1": 84.20, "sample_sd_top1": 0.32}
+    },
+    {
+      "name": "cnn_relu_none_64_128_256",
+      "original_30_top1": 83.9,
+      "epoch_30": {"n": 3, "mean_top1": 83.96, "sample_sd_top1": 0.16},
+      "epoch_100": {"n": 3, "mean_top1": 86.25, "sample_sd_top1": 0.21}
+    }
+  ],
+  "divergences": [
+    {
+      "name": "mlp_x3px_layernorm_128x64x32",
+      "seed": 44,
+      "epoch_budget": 30,
+      "reason": "non-finite training loss at epoch 1"
+    },
+    {
+      "name": "mlp_x3px_layernorm_128x64x32",
+      "seed": 44,
+      "epoch_budget": 100,
+      "reason": "non-finite training loss at epoch 1"
+    }
+  ],
+  "rounding_note": "Central-architecture means and sample standard deviations are rounded to two decimal places; rank statistics retain full precision."
+}

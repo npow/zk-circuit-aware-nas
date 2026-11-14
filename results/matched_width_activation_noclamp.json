@@ -1,0 +1,242 @@
+[
+ {
+  "name": "mlp_128x64x32_x2",
+  "act": "x2",
+  "skeleton": "mlp_128x64x32",
+  "error": null,
+  "clamp": "none",
+  "logrows": 19,
+  "num_rows": 203929,
+  "total_assignments": 407859,
+  "total_const_size": 403246,
+  "input_scale": 13,
+  "lookup_range": [
+   0,
+   0
+  ]
+ },
+ {
+  "name": "mlp_128x64x32_x2px",
+  "act": "x2px",
+  "skeleton": "mlp_128x64x32",
+  "error": null,
+  "clamp": "none",
+  "logrows": 19,
+  "num_rows": 204041,
+  "total_assignments": 408083,
+  "total_const_size": 403246,
+  "input_scale": 13,
+  "lookup_range": [
+   0,
+   0
+  ]
+ },
+ {
+  "name": "mlp_128x64x32_x3px",
+  "act": "x3px",
+  "skeleton": "mlp_128x64x32",
+  "error": null,
+  "clamp": "none",
+  "logrows": 23,
+  "num_rows": 202118,
+  "total_assignments": 404237,
+  "total_const_size": 399195,
+  "input_scale": 11,
+  "lookup_range": [
+   0,
+   0
+  ]
+ },
+ {
+  "name": "mlp_256x128_x2",
+  "act": "x2",
+  "skeleton": "mlp_256x128",
+  "error": null,
+  "clamp": "none",
+  "logrows": 20,
+  "num_rows": 412458,
+  "total_assignments": 824917,
+  "total_const_size": 819257,
+  "input_scale": 13,
+  "lookup_range": [
+   0,
+   0
+  ]
+ },
+ {
+  "name": "mlp_256x128_x2px",
+  "act": "x2px",
+  "skeleton": "mlp_256x128",
+  "error": null,
+  "clamp": "none",
+  "logrows": 20,
+  "num_rows": 412650,
+  "total_assignments": 825301,
+  "total_const_size": 819257,
+  "input_scale": 13,
+  "lookup_range": [
+   0,
+   0
+  ]
+ },
+ {
+  "name": "mlp_256x128_x3px",
+  "act": "x3px",
+  "skeleton": "mlp_256x128",
+  "error": null,
+  "clamp": "none",
+  "logrows": 23,
+  "num_rows": 408827,
+  "total_assignments": 817655,
+  "total_const_size": 811277,
+  "input_scale": 11,
+  "lookup_range": [
+   0,
+   0
+  ]
+ },
+ {
+  "name": "mlp_512x256_x2",
+  "act": "x2",
+  "skeleton": "mlp_512x256",
+  "error": null,
+  "clamp": "none",
+  "logrows": 21,
+  "num_rows": 856107,
+  "total_assignments": 1712215,
+  "total_const_size": 1704071,
+  "input_scale": 13,
+  "lookup_range": [
+   0,
+   0
+  ]
+ },
+ {
+  "name": "mlp_512x256_x2px",
+  "act": "x2px",
+  "skeleton": "mlp_512x256",
+  "error": null,
+  "clamp": "none",
+  "logrows": 21,
+  "num_rows": 856491,
+  "total_assignments": 1712983,
+  "total_const_size": 1704071,
+  "input_scale": 13,
+  "lookup_range": [
+   0,
+   0
+  ]
+ },
+ {
+  "name": "mlp_512x256_x3px",
+  "act": "x3px",
+  "skeleton": "mlp_512x256",
+  "error": null,
+  "clamp": "none",
+  "logrows": 23,
+  "num_rows": 848576,
+  "total_assignments": 1697153,
+  "total_const_size": 1687517,
+  "input_scale": 11,
+  "lookup_range": [
+   0,
+   0
+  ]
+ },
+ {
+  "name": "cnn_16_32_x2",
+  "act": "x2",
+  "skeleton": "cnn_16_32",
+  "error": null,
+  "clamp": "none",
+  "logrows": 21,
+  "num_rows": 916113,
+  "total_assignments": 1832227,
+  "total_const_size": 1637163,
+  "input_scale": 13,
+  "lookup_range": [
+   0,
+   90690
+  ]
+ },
+ {
+  "name": "cnn_16_32_x2px",
+  "act": "x2px",
+  "skeleton": "cnn_16_32",
+  "error": null,
+  "clamp": "none",
+  "logrows": 21,
+  "num_rows": 928401,
+  "total_assignments": 1856803,
+  "total_const_size": 1637163,
+  "input_scale": 13,
+  "lookup_range": [
+   0,
+   127294
+  ]
+ },
+ {
+  "name": "cnn_16_32_x3px",
+  "act": "x3px",
+  "skeleton": "cnn_16_32",
+  "error": null,
+  "clamp": "none",
+  "logrows": 23,
+  "num_rows": 939730,
+  "total_assignments": 1879461,
+  "total_const_size": 1635926,
+  "input_scale": 11,
+  "lookup_range": [
+   0,
+   65170
+  ]
+ },
+ {
+  "name": "cnn_16_32_64_x2",
+  "act": "x2",
+  "skeleton": "cnn_16_32_64",
+  "error": null,
+  "clamp": "none",
+  "logrows": 22,
+  "num_rows": 1454838,
+  "total_assignments": 2909677,
+  "total_const_size": 2678382,
+  "input_scale": 13,
+  "lookup_range": [
+   0,
+   104074
+  ]
+ },
+ {
+  "name": "cnn_16_32_64_x2px",
+  "act": "x2px",
+  "skeleton": "cnn_16_32_64",
+  "error": null,
+  "clamp": "none",
+  "logrows": 22,
+  "num_rows": 1469174,
+  "total_assignments": 2938349,
+  "total_const_size": 2678382,
+  "input_scale": 13,
+  "lookup_range": [
+   0,
+   192002
+  ]
+ },
+ {
+  "name": "cnn_16_32_64_x3px",
+  "act": "x3px",
+  "skeleton": "cnn_16_32_64",
+  "error": null,
+  "clamp": "none",
+  "logrows": 23,
+  "num_rows": 1481495,
+  "total_assignments": 2962991,
+  "total_const_size": 2676305,
+  "input_scale": 11,
+  "lookup_range": [
+   0,
+   604694
+  ]
+ }
+]

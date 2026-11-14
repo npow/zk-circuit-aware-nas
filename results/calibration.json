@@ -1,0 +1,76 @@
+{
+  "r_squared_all": 0.962185,
+  "r_squared_clean": 0.962185,
+  "n_models_total": 9,
+  "n_models_clean": 9,
+  "outlier_bounds": [
+    0.25,
+    4.0
+  ],
+  "node_overhead": 4096,
+  "per_model": [
+    {
+      "model": "mlp_small",
+      "proxy_snapped": 2097152,
+      "ezkl_actual": 2097152,
+      "ratio": 1.0,
+      "outlier": false
+    },
+    {
+      "model": "lenet5",
+      "proxy_snapped": 1048576,
+      "ezkl_actual": 1048576,
+      "ratio": 1.0,
+      "outlier": false
+    },
+    {
+      "model": "mlp_large",
+      "proxy_snapped": 4194304,
+      "ezkl_actual": 4194304,
+      "ratio": 1.0,
+      "outlier": false
+    },
+    {
+      "model": "lenet5_poly",
+      "proxy_snapped": 1048576,
+      "ezkl_actual": 1048576,
+      "ratio": 1.0,
+      "outlier": false
+    },
+    {
+      "model": "mlp_poly",
+      "proxy_snapped": 2097152,
+      "ezkl_actual": 2097152,
+      "ratio": 1.0,
+      "outlier": false
+    },
+    {
+      "model": "resnet20",
+      "proxy_snapped": 67108864,
+      "ezkl_actual": 67108864,
+      "ratio": 1.0,
+      "outlier": false
+    },
+    {
+      "model": "vgg11_small",
+      "proxy_snapped": 67108864,
+      "ezkl_actual": 33554432,
+      "ratio": 0.5,
+      "outlier": false
+    },
+    {
+      "model": "resnet20_relu_bn_free",
+      "proxy_snapped": 67108864,
+      "ezkl_actual": 67108864,
+      "ratio": 1.0,
+      "outlier": false
+    },
+    {
+      "model": "resnet20_poly",
+      "proxy_snapped": 67108864,
+      "ezkl_actual": 33554432,
+      "ratio": 0.5,
+      "outlier": false
+    }
+  ]
+}

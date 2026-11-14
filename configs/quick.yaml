@@ -1,0 +1,27 @@
+benchmark:
+  name: "quick"
+  output_dir: "./results"
+  seed: 42
+  num_seeds: 1
+  data_dir: ~/.zkml_bench/data
+
+datasets:
+  - name: mnist
+
+models:
+  - name: mlp_small
+  - name: mlp_poly
+
+training:
+  epochs: 5
+  batch_size: 128
+  lr: 0.01
+  device: auto
+
+zk:
+  proxy_only: true
+  ezkl_calibration_samples: 64
+
+output:
+  formats: [json, csv, plot, markdown]
+  plot_log_scale_x: true

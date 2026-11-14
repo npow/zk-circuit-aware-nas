@@ -1,0 +1,121 @@
+[
+  {
+    "name": "mlp_x2px_none_128x64x32",
+    "top1": 51.06,
+    "constraints": 420384,
+    "act": "x2px",
+    "family": "mlp",
+    "ezkl_logrows": 18,
+    "mock_time_s": 19.136,
+    "mock_ok": true,
+    "proxy_ratio": 1.6036376953125
+  },
+  {
+    "name": "mlp_x2px_layernorm_128x64x32",
+    "top1": 52.01,
+    "constraints": 425760,
+    "act": "x2px",
+    "family": "mlp",
+    "ezkl_logrows": 18,
+    "mock_time_s": 19.232,
+    "mock_ok": true,
+    "proxy_ratio": 1.6241455078125
+  },
+  {
+    "name": "dws_relu_none_16_32_64",
+    "top1": 62.91,
+    "constraints": 499392,
+    "act": "relu",
+    "family": "cnn",
+    "ezkl_logrows": 21,
+    "mock_time_s": 272.465,
+    "mock_ok": true,
+    "proxy_ratio": 0.238128662109375
+  },
+  {
+    "name": "dws_relu_none_32_64_128",
+    "top1": 69.31,
+    "constraints": 1466752,
+    "act": "relu",
+    "family": "cnn",
+    "ezkl_logrows": 22,
+    "mock_time_s": 256.431,
+    "mock_ok": true,
+    "proxy_ratio": 0.349700927734375
+  },
+  {
+    "name": "dws_relu_none_32_64_128_256",
+    "top1": 75.02,
+    "constraints": 2033408,
+    "act": "relu",
+    "family": "cnn",
+    "ezkl_logrows": 22,
+    "mock_time_s": 534.439,
+    "mock_ok": true,
+    "proxy_ratio": 0.48480224609375
+  },
+  {
+    "name": "cnn_relu_none_16_32_64",
+    "top1": 77.09,
+    "constraints": 2894528,
+    "act": "relu",
+    "family": "cnn",
+    "ezkl_logrows": 22,
+    "mock_time_s": 949.519,
+    "mock_ok": true,
+    "proxy_ratio": 0.6901092529296875
+  },
+  {
+    "name": "cnn_relu_none_16_32_64_128",
+    "top1": 81.57,
+    "constraints": 4086144,
+    "act": "relu",
+    "family": "cnn",
+    "ezkl_logrows": 22,
+    "mock_time_s": 1119.078,
+    "mock_ok": true,
+    "proxy_ratio": 0.974212646484375
+  },
+  {
+    "name": "cnn_relu_none_64_128_256",
+    "top1": 83.87,
+    "constraints": 39840512,
+    "act": "relu",
+    "family": "cnn",
+    "ezkl_logrows": 25,
+    "mock_time_s": null,
+    "skipped": "logrows=25>23"
+  },
+  {
+    "name": "mlp_relu_none_1024x512",
+    "top1": 49.69,
+    "constraints": 3690496,
+    "act": "relu",
+    "family": "mlp",
+    "ezkl_logrows": 21,
+    "mock_time_s": 137.228,
+    "mock_ok": true,
+    "proxy_ratio": 1.759765625
+  },
+  {
+    "name": "cnn_x3px_layernorm_32_64_128",
+    "top1": 56.54,
+    "constraints": 11867520,
+    "act": "x3px",
+    "family": "cnn",
+    "ezkl_logrows": 24,
+    "mock_time_s": null,
+    "skipped": "logrows=24>23"
+  },
+  {
+    "name": "dws_x2px_groupnorm_32_64",
+    "top1": 54.82,
+    "constraints": 2047680,
+    "act": "x2px",
+    "family": "cnn",
+    "ezkl_logrows": 23,
+    "mock_time_s": 2265.524,
+    "mock_ok": true,
+    "proxy_ratio": 0.24410247802734375
+  }
+]

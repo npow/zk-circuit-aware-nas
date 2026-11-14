@@ -1,0 +1,35 @@
+[
+  {
+    "name": "mlp_x2px_none_128x64x32",
+    "top1": 51.06,
+    "logrows": 18,
+    "pareto": true,
+    "prove_time_s": 57.5,
+    "proof_size_bytes": 18740,
+    "proof_size_kb": 18.3,
+    "verify_time_s": 0.195,
+    "verify_ok": true
+  },
+  {
+    "name": "mlp_x2px_layernorm_128x64x32",
+    "top1": 52.01,
+    "logrows": 18,
+    "pareto": true,
+    "prove_time_s": 46.74,
+    "proof_size_bytes": 21843,
+    "proof_size_kb": 21.3,
+    "verify_time_s": 0.431,
+    "verify_ok": true
+  },
+  {
+    "name": "dws_relu_none_16_32_64",
+    "top1": 62.91,
+    "logrows": 21,
+    "pareto": true,
+    "prove_time_s": 1339.88,
+    "proof_size_bytes": 37027,
+    "proof_size_kb": 36.2,
+    "verify_time_s": 4.74,
+    "verify_ok": true
+  }
+]

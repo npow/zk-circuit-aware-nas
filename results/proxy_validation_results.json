@@ -1,0 +1,155 @@
+[
+  {
+    "name": "mlp_small",
+    "input_shape": [
+      3,
+      32,
+      32
+    ],
+    "proxy_constraints": 1720320,
+    "proxy_constraints_snapped": 2097152,
+    "proxy_nonlinear_ops": 2,
+    "proxy_params": 1707274,
+    "ezkl_logrows": 21,
+    "ezkl_num_constraints": 2097152,
+    "ezkl_mock_time_s": 12.690086087211967,
+    "ezkl_error": null,
+    "proxy_error": null
+  },
+  {
+    "name": "lenet5",
+    "input_shape": [
+      3,
+      32,
+      32
+    ],
+    "proxy_constraints": 686792,
+    "proxy_constraints_snapped": 1048576,
+    "proxy_nonlinear_ops": 4,
+    "proxy_params": 62006,
+    "ezkl_logrows": 20,
+    "ezkl_num_constraints": 1048576,
+    "ezkl_mock_time_s": 7.286054607015103,
+    "ezkl_error": null,
+    "proxy_error": null
+  },
+  {
+    "name": "mlp_large",
+    "input_shape": [
+      3,
+      32,
+      32
+    ],
+    "proxy_constraints": 3823616,
+    "proxy_constraints_snapped": 4194304,
+    "proxy_nonlinear_ops": 3,
+    "proxy_params": 3805450,
+    "ezkl_logrows": 22,
+    "ezkl_num_constraints": 4194304,
+    "ezkl_mock_time_s": 27.455582934897393,
+    "ezkl_error": null,
+    "proxy_error": null
+  },
+  {
+    "name": "lenet5_poly",
+    "input_shape": [
+      3,
+      32,
+      32
+    ],
+    "proxy_constraints": 680284,
+    "proxy_constraints_snapped": 1048576,
+    "proxy_nonlinear_ops": 0,
+    "proxy_params": 62006,
+    "ezkl_logrows": 20,
+    "ezkl_num_constraints": 1048576,
+    "ezkl_mock_time_s": 8.088519174605608,
+    "ezkl_error": null,
+    "proxy_error": null
+  },
+  {
+    "name": "mlp_poly",
+    "input_shape": [
+      3,
+      32,
+      32
+    ],
+    "proxy_constraints": 1719552,
+    "proxy_constraints_snapped": 2097152,
+    "proxy_nonlinear_ops": 0,
+    "proxy_params": 1707274,
+    "ezkl_logrows": 21,
+    "ezkl_num_constraints": 2097152,
+    "ezkl_mock_time_s": 13.264069454278797,
+    "ezkl_error": null,
+    "proxy_error": null
+  },
+  {
+    "name": "resnet20",
+    "input_shape": [
+      3,
+      32,
+      32
+    ],
+    "proxy_constraints": 41280192,
+    "proxy_constraints_snapped": 67108864,
+    "proxy_nonlinear_ops": 19,
+    "proxy_params": 272474,
+    "ezkl_logrows": 26,
+    "ezkl_num_constraints": 67108864,
+    "ezkl_mock_time_s": null,
+    "ezkl_error": null,
+    "proxy_error": null
+  },
+  {
+    "name": "vgg11_small",
+    "input_shape": [
+      3,
+      32,
+      32
+    ],
+    "proxy_constraints": 39277312,
+    "proxy_constraints_snapped": 67108864,
+    "proxy_nonlinear_ops": 15,
+    "proxy_params": 2705610,
+    "ezkl_logrows": 25,
+    "ezkl_num_constraints": 33554432,
+    "ezkl_mock_time_s": null,
+    "ezkl_error": null,
+    "proxy_error": null
+  },
+  {
+    "name": "resnet20_relu_bn_free",
+    "input_shape": [
+      3,
+      32,
+      32
+    ],
+    "proxy_constraints": 41280192,
+    "proxy_constraints_snapped": 67108864,
+    "proxy_nonlinear_ops": 19,
+    "proxy_params": 271690,
+    "ezkl_logrows": 26,
+    "ezkl_num_constraints": 67108864,
+    "ezkl_mock_time_s": null,
+    "ezkl_error": null,
+    "proxy_error": null
+  },
+  {
+    "name": "resnet20_poly",
+    "input_shape": [
+      3,
+      32,
+      32
+    ],
+    "proxy_constraints": 41280192,
+    "proxy_constraints_snapped": 67108864,
+    "proxy_nonlinear_ops": 0,
+    "proxy_params": 271690,
+    "ezkl_logrows": 25,
+    "ezkl_num_constraints": 33554432,
+    "ezkl_mock_time_s": null,
+    "ezkl_error": null,
+    "proxy_error": null
+  }
+]

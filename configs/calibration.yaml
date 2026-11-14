@@ -1,0 +1,36 @@
+benchmark:
+  name: "calibration"
+  output_dir: "./results"
+  seed: 42
+  num_seeds: 1
+  data_dir: ~/.zkml_bench/data
+
+# All 17 models validated in proxy_validation_results.json
+# Input shape: (3, 32, 32) — CIFAR-10
+datasets:
+  - name: cifar10
+
+models:
+  - name: mlp_small
+  - name: lenet5
+  - name: mlp_large
+  - name: lenet5_poly
+  - name: mlp_poly
+  - name: resnet20
+  - name: vgg11_small
+  - name: resnet20_relu_bn_free
+  - name: resnet20_poly
+
+training:
+  epochs: 0  # Use pre-trained or skip training; set weights_path if needed
+  batch_size: 128
+  device: auto
+
+zk:
+  proxy_only: false  # Run EZKL for calibration
+  ezkl_timeout_setup: 1800
+  ezkl_timeout_prove: 900
+  ezkl_calibration_samples: 64
+
+output:
+  formats: [json]
