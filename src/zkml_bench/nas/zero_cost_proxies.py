@@ -392,7 +392,7 @@ def zico_score(
     *,
     data: Union[torch.Tensor, None] = None,
 ) -> float:
-    """Compute the ZiCo score (Li et al., ICLR 2023, arXiv:2301.11233).
+    """Compute the ZiCo score (Li et al., ICLR 2023, arXiv:2301.11300).
 
     ZiCo = Σ_l [ log(σ(|∇_{W_l} L|)) − log(|μ(∇_{W_l} L)|) ]
 
@@ -680,6 +680,55 @@ def naswot_score(
             log_det = float("-inf")
 
     return log_det
+
+
+def naswot_sign_score(
+    model: nn.Module,
+    input_shape: tuple,
+    device: str = "cpu",
+    n_samples: int = 32,
+) -> float:
+    """NASWOT using the sign of each activation module's *input* (pre-activation).
+
+    Standard NASWOT scores the binary output pattern of nn.ReLU modules and therefore
+    returns -inf for any network without nn.ReLU (all polynomial networks), whether or
+    not the underlying mathematics is degenerate.  This variant instead records
+    1[pre-activation > 0] at the input of every activation module (nn.ReLU and the
+    sweep's Square, CubicPlusLinear and SquarePlusLinear), which is identical to the
+    standard score for ReLU networks and is defined for polynomial networks.  It is a
+    heuristic generalization, not part of the original NASWOT paper.
+    """
+    dev = torch.device(device)
+    model = model.to(dev)
+    model.eval()
+    names = {"ReLU", "Square", "CubicPlusLinear", "SquarePlusLinear"}
+    patterns, hooks = [], []
+
+    def _hook(module, inp, out):
+        patterns.append((inp[0].detach() > 0).float().reshape(inp[0].shape[0], -1).cpu())
+
+    for m in model.modules():
+        if type(m).__name__ in names:
+            hooks.append(m.register_forward_pre_hook(lambda mod, inp: _hook(mod, inp, None)))
+    x = torch.randn(n_samples, *input_shape).to(dev)
+    try:
+        with torch.no_grad():
+            model(x)
+    finally:
+        for h in hooks:
+            h.remove()
+    if not patterns:
+        return float("-inf")
+    P = torch.cat(patterns, dim=1).float()
+    K = P @ P.T + (1.0 - P) @ (1.0 - P).T
+    if torch.linalg.matrix_rank(K).item() <= 1:
+        return float("-inf")
+    try:
+        L = torch.linalg.cholesky(K + 1e-6 * torch.eye(n_samples))
+        return 2.0 * torch.log(torch.diagonal(L)).sum().item()
+    except Exception:
+        sign, ld = torch.linalg.slogdet(K)
+        return ld.item() if sign.item() > 0 else float("-inf")
 
 
 # ---------------------------------------------------------------------------

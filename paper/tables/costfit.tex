@@ -1,0 +1,26 @@
+\begin{table}[h]
+\centering
+\caption{Cost model of Eq.~\eqref{eq:cost} against ezkl-calibrated $\logrows$ on \emph{trained} networks with real inputs.
+  Coefficients are fitted by non-negative least squares (relative-error weighting) on 187 networks and evaluated on the
+  56 networks of the earlier validation set, which are excluded from the fit.  ``exact'' and ``within 1'' count
+  networks whose predicted $\lceil\log_2 C\rceil$ equals or is within one of the calibrated $\logrows$; $\rho$ is Spearman between predicted and
+  calibrated $\logrows$; RMSE is in $\log_2$ of assigned cells.}
+\label{tab:costfit}
+\small
+\begin{tabular}{lrrrrr}
+\toprule
+ & $n$ & \textbf{exact} & \textbf{within 1} & $\rho$ & \textbf{RMSE} \\
+\midrule
+Hand-set proxy, evaluation split & 56 & 39 & 52 & 0.82 & 0.18 \\
+Fitted (NNLS), evaluation split & 56 & 43 & 53 & 0.86 & 0.11 \\
+Fitted (NNLS), fit split & 187 & 132 & 178 & 0.90 & 0.11 \\
+\quad fitted, eval, ReLU & 21 & 18 & 21 & 0.96 & 0.10 \\
+\quad fitted, eval, $x^2$ & 11 & 10 & 11 & 0.98 & 0.07 \\
+\quad fitted, eval, $x^2{+}x$ & 17 & 12 & 17 & 0.95 & 0.14 \\
+\quad fitted, eval, $x^3{+}x$ & 7 & 3 & 4 & 0.12 & 0.09 \\
+\bottomrule
+\end{tabular}
+
+\smallskip
+{\scriptsize Fitted coefficients (cells per MAC / per node / per element): macs\_conv\_standard=0.934, macs\_conv\_depthwise=1.11, macs\_gemm=0.992, n\_matmul\_conv\_nodes=0, elem\_relu=15, elem\_pow=12.4, elem\_mul=2.21, elem\_add\_sub=3.47, elem\_norm=5.55, elem\_pool\_reduce=0.}
+\end{table}

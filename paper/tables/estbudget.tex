@@ -1,0 +1,19 @@
+\begin{table}[h]
+\centering
+\caption{Filtering by the cost model's \emph{estimated} $\logrows$ (no ezkl run) against the \emph{calibrated} budget, on the 243 calibrated trained networks.
+  ``feasible'': calibrated $\logrows\le B$.  ``admitted'': estimated $\logrows\le B$.  ``Exceeds'': share of admitted networks whose calibrated $\logrows>B$.
+  ``Rejected'': share of feasible networks the estimate rejects.  ``Violation'': share of the $K{=}10$ highest-NEAR networks, chosen inside the estimated budget
+  (or with no budget), whose calibrated $\logrows>B$.  $95\%$ bootstrap intervals over networks.}
+\label{tab:estbudget}
+\small
+\begin{tabular}{rrrrrrr}
+\toprule
+$B$ & \textbf{feasible} & \textbf{admitted} & \textbf{exceeds} & \textbf{rejected} & \textbf{violation (est.\ budget)} & \textbf{violation (no budget)} \\
+\midrule
+$\le20$ & 36 & 33 & 0.18 {\scriptsize[0.06,0.34]} & 0.25 {\scriptsize[0.11,0.40]} & 0.0 {\scriptsize[0.0,0.2]} & 1.0 \\
+$\le21$ & 72 & 72 & 0.21 {\scriptsize[0.12,0.30]} & 0.21 {\scriptsize[0.12,0.32]} & 0.4 {\scriptsize[0.1,0.8]} & 1.0 \\
+$\le22$ & 111 & 126 & 0.17 {\scriptsize[0.11,0.23]} & 0.05 {\scriptsize[0.02,0.10]} & 0.1 {\scriptsize[0.0,0.3]} & 1.0 \\
+$\le23$ & 175 & 165 & 0.00 {\scriptsize[0.00,0.00]} & 0.06 {\scriptsize[0.02,0.09]} & 0.0 {\scriptsize[0.0,0.0]} & 1.0 \\
+\bottomrule
+\end{tabular}
+\end{table}

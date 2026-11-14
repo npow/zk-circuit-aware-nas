@@ -1,0 +1,962 @@
+[
+ {
+  "name": "cnn_relu_groupnorm_64_128_256",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "cnn_relu_layernorm_64_128_256",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "cnn_relu_none_64_128_256",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "cnn_x2_groupnorm_16_32_64_128",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "cnn_x2_groupnorm_64_128_256",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "cnn_x2_layernorm_64_128_256",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "cnn_x2_none_64_128_256",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "cnn_x2px_groupnorm_16_32_64_128",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "cnn_x2px_groupnorm_64_128_256",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "cnn_x2px_layernorm_64_128_256",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "cnn_x2px_none_64_128_256",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "cnn_x3px_groupnorm_16_32_64",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "cnn_x3px_groupnorm_16_32_64_128",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "cnn_x3px_groupnorm_32_64",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "cnn_x3px_groupnorm_32_64_128",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "cnn_x3px_groupnorm_64_128_256",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "cnn_x3px_layernorm_64_128_256",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "cnn_x3px_none_16_32_64_128",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "cnn_x3px_none_64_128_256",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "dws_resnet_relu_groupnorm_c48_b4",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "dws_resnet_relu_groupnorm_c64_b4",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "dws_resnet_relu_layernorm_c48_b4",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "dws_resnet_relu_layernorm_c64_b4",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "dws_resnet_relu_none_c64_b4",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "dws_resnet_x2_groupnorm_c16_b2",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x2_groupnorm_c16_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x2_groupnorm_c16_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x2_groupnorm_c24_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x2_groupnorm_c32_b2",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x2_groupnorm_c32_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x2_groupnorm_c32_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x2_groupnorm_c48_b2",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x2_groupnorm_c48_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x2_groupnorm_c64_b2",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x2_groupnorm_c64_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x2_layernorm_c16_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x2_layernorm_c32_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x2_layernorm_c48_b4",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "dws_resnet_x2_layernorm_c64_b4",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "dws_resnet_x2_none_c16_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x2_none_c32_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x2_none_c64_b4",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "dws_resnet_x2px_groupnorm_c16_b2",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x2px_groupnorm_c16_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x2px_groupnorm_c16_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x2px_groupnorm_c24_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x2px_groupnorm_c32_b2",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x2px_groupnorm_c32_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x2px_groupnorm_c32_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x2px_groupnorm_c48_b2",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x2px_groupnorm_c48_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x2px_groupnorm_c64_b2",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x2px_groupnorm_c64_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x2px_layernorm_c16_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x2px_layernorm_c32_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x2px_layernorm_c48_b4",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "dws_resnet_x2px_layernorm_c64_b4",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "dws_resnet_x2px_none_c16_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x2px_none_c32_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x2px_none_c64_b4",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "dws_resnet_x3px_groupnorm_c16_b2",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x3px_groupnorm_c16_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x3px_groupnorm_c16_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x3px_groupnorm_c24_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x3px_groupnorm_c32_b2",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x3px_groupnorm_c32_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x3px_groupnorm_c32_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x3px_groupnorm_c48_b2",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x3px_groupnorm_c48_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x3px_groupnorm_c64_b2",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x3px_groupnorm_c64_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x3px_layernorm_c16_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x3px_layernorm_c16_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x3px_layernorm_c24_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x3px_layernorm_c32_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x3px_layernorm_c32_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x3px_layernorm_c48_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x3px_layernorm_c64_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x3px_none_c16_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x3px_none_c16_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x3px_none_c24_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x3px_none_c32_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x3px_none_c32_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x3px_none_c48_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_resnet_x3px_none_c64_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_x2_groupnorm_32_64_128_256",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_x2_groupnorm_64_128_256",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_x2_none_16_32_64",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_x2_none_32_64_128",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_x2_none_32_64_128_256",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_x2_none_64_128_256",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_x2px_groupnorm_32_64_128_256",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_x2px_groupnorm_64_128_256",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_x3px_groupnorm_16_32_64",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_x3px_groupnorm_32_64",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_x3px_groupnorm_32_64_128",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_x3px_groupnorm_32_64_128_256",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "dws_x3px_groupnorm_64_128_256",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "mlp_deep_x2_layernorm_1024x512x256",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "mlp_deep_x2_layernorm_128x128x128x128",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "mlp_deep_x2_layernorm_2048x512",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "mlp_deep_x2_layernorm_256x256x256",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "mlp_deep_x2_layernorm_512x128",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "mlp_deep_x2px_layernorm_1024x512x256",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "mlp_deep_x2px_layernorm_128x128x128x128",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "mlp_deep_x2px_layernorm_2048x512",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "mlp_deep_x2px_layernorm_256x256x256",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "mlp_deep_x3px_layernorm_1024x512x256",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "mlp_deep_x3px_layernorm_128x128x128x128",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "mlp_deep_x3px_layernorm_2048x512",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "mlp_deep_x3px_layernorm_256x256x256",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "mlp_deep_x3px_layernorm_512x128",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "mlp_deep_x3px_none_128x128x128x128",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "mlp_x2_layernorm_1024x512",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "mlp_x2_layernorm_512x256",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "mlp_x2_layernorm_512x256x128",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "mlp_x2px_layernorm_1024x512",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "mlp_x2px_layernorm_512x256",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "mlp_x3px_layernorm_1024x512",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "mlp_x3px_layernorm_128x64x32",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "mlp_x3px_layernorm_256x128",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "mlp_x3px_layernorm_256x128x64",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "mlp_x3px_layernorm_512x256",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "mlp_x3px_layernorm_512x256x128",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_relu_groupnorm_c16_b6",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "resnet_relu_groupnorm_c24_b4",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "resnet_relu_groupnorm_c32_b2",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "resnet_relu_groupnorm_c32_b4",
+  "reason": "proxy-estimated logrows 27 > 25"
+ },
+ {
+  "name": "resnet_relu_groupnorm_c32_b6",
+  "reason": "proxy-estimated logrows 27 > 25"
+ },
+ {
+  "name": "resnet_relu_groupnorm_c48_b2",
+  "reason": "proxy-estimated logrows 27 > 25"
+ },
+ {
+  "name": "resnet_relu_groupnorm_c48_b4",
+  "reason": "proxy-estimated logrows 28 > 25"
+ },
+ {
+  "name": "resnet_relu_groupnorm_c64_b2",
+  "reason": "proxy-estimated logrows 28 > 25"
+ },
+ {
+  "name": "resnet_relu_groupnorm_c64_b4",
+  "reason": "proxy-estimated logrows 29 > 25"
+ },
+ {
+  "name": "resnet_relu_layernorm_c16_b6",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "resnet_relu_layernorm_c24_b4",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "resnet_relu_layernorm_c32_b2",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "resnet_relu_layernorm_c32_b4",
+  "reason": "proxy-estimated logrows 27 > 25"
+ },
+ {
+  "name": "resnet_relu_layernorm_c32_b6",
+  "reason": "proxy-estimated logrows 27 > 25"
+ },
+ {
+  "name": "resnet_relu_layernorm_c48_b2",
+  "reason": "proxy-estimated logrows 27 > 25"
+ },
+ {
+  "name": "resnet_relu_layernorm_c48_b4",
+  "reason": "proxy-estimated logrows 28 > 25"
+ },
+ {
+  "name": "resnet_relu_layernorm_c64_b2",
+  "reason": "proxy-estimated logrows 28 > 25"
+ },
+ {
+  "name": "resnet_relu_layernorm_c64_b4",
+  "reason": "proxy-estimated logrows 29 > 25"
+ },
+ {
+  "name": "resnet_relu_none_c24_b4",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "resnet_relu_none_c32_b2",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "resnet_relu_none_c32_b4",
+  "reason": "proxy-estimated logrows 27 > 25"
+ },
+ {
+  "name": "resnet_relu_none_c32_b6",
+  "reason": "proxy-estimated logrows 27 > 25"
+ },
+ {
+  "name": "resnet_relu_none_c48_b2",
+  "reason": "proxy-estimated logrows 27 > 25"
+ },
+ {
+  "name": "resnet_relu_none_c48_b4",
+  "reason": "proxy-estimated logrows 28 > 25"
+ },
+ {
+  "name": "resnet_relu_none_c64_b2",
+  "reason": "proxy-estimated logrows 28 > 25"
+ },
+ {
+  "name": "resnet_relu_none_c64_b4",
+  "reason": "proxy-estimated logrows 29 > 25"
+ },
+ {
+  "name": "resnet_x2_groupnorm_c16_b2",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2_groupnorm_c16_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2_groupnorm_c16_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2_groupnorm_c24_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2_groupnorm_c32_b2",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2_groupnorm_c32_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2_groupnorm_c32_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2_groupnorm_c48_b2",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2_groupnorm_c48_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2_groupnorm_c64_b2",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2_groupnorm_c64_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2_layernorm_c16_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2_layernorm_c24_b4",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "resnet_x2_layernorm_c32_b2",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "resnet_x2_layernorm_c32_b4",
+  "reason": "proxy-estimated logrows 27 > 25"
+ },
+ {
+  "name": "resnet_x2_layernorm_c32_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2_layernorm_c48_b2",
+  "reason": "proxy-estimated logrows 27 > 25"
+ },
+ {
+  "name": "resnet_x2_layernorm_c48_b4",
+  "reason": "proxy-estimated logrows 28 > 25"
+ },
+ {
+  "name": "resnet_x2_layernorm_c64_b2",
+  "reason": "proxy-estimated logrows 28 > 25"
+ },
+ {
+  "name": "resnet_x2_layernorm_c64_b4",
+  "reason": "proxy-estimated logrows 29 > 25"
+ },
+ {
+  "name": "resnet_x2_none_c16_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2_none_c16_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2_none_c24_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2_none_c32_b2",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "resnet_x2_none_c32_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2_none_c32_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2_none_c48_b2",
+  "reason": "proxy-estimated logrows 27 > 25"
+ },
+ {
+  "name": "resnet_x2_none_c48_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2_none_c64_b2",
+  "reason": "proxy-estimated logrows 28 > 25"
+ },
+ {
+  "name": "resnet_x2_none_c64_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2px_groupnorm_c16_b2",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2px_groupnorm_c16_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2px_groupnorm_c16_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2px_groupnorm_c24_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2px_groupnorm_c32_b2",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2px_groupnorm_c32_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2px_groupnorm_c32_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2px_groupnorm_c48_b2",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2px_groupnorm_c48_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2px_groupnorm_c64_b2",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2px_groupnorm_c64_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2px_layernorm_c16_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2px_layernorm_c24_b4",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "resnet_x2px_layernorm_c32_b2",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "resnet_x2px_layernorm_c32_b4",
+  "reason": "proxy-estimated logrows 27 > 25"
+ },
+ {
+  "name": "resnet_x2px_layernorm_c32_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2px_layernorm_c48_b2",
+  "reason": "proxy-estimated logrows 27 > 25"
+ },
+ {
+  "name": "resnet_x2px_layernorm_c48_b4",
+  "reason": "proxy-estimated logrows 28 > 25"
+ },
+ {
+  "name": "resnet_x2px_layernorm_c64_b2",
+  "reason": "proxy-estimated logrows 28 > 25"
+ },
+ {
+  "name": "resnet_x2px_layernorm_c64_b4",
+  "reason": "proxy-estimated logrows 29 > 25"
+ },
+ {
+  "name": "resnet_x2px_none_c16_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2px_none_c24_b4",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "resnet_x2px_none_c32_b2",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "resnet_x2px_none_c32_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2px_none_c32_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2px_none_c48_b2",
+  "reason": "proxy-estimated logrows 27 > 25"
+ },
+ {
+  "name": "resnet_x2px_none_c48_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x2px_none_c64_b2",
+  "reason": "proxy-estimated logrows 28 > 25"
+ },
+ {
+  "name": "resnet_x2px_none_c64_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x3px_groupnorm_c16_b2",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x3px_groupnorm_c16_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x3px_groupnorm_c16_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x3px_groupnorm_c24_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x3px_groupnorm_c32_b2",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x3px_groupnorm_c32_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x3px_groupnorm_c32_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x3px_groupnorm_c48_b2",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x3px_groupnorm_c48_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x3px_groupnorm_c64_b2",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x3px_groupnorm_c64_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x3px_layernorm_c16_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x3px_layernorm_c16_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x3px_layernorm_c24_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x3px_layernorm_c32_b2",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "resnet_x3px_layernorm_c32_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x3px_layernorm_c32_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x3px_layernorm_c48_b2",
+  "reason": "proxy-estimated logrows 27 > 25"
+ },
+ {
+  "name": "resnet_x3px_layernorm_c48_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x3px_layernorm_c64_b2",
+  "reason": "proxy-estimated logrows 28 > 25"
+ },
+ {
+  "name": "resnet_x3px_layernorm_c64_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x3px_none_c16_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x3px_none_c16_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x3px_none_c24_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x3px_none_c32_b2",
+  "reason": "proxy-estimated logrows 26 > 25"
+ },
+ {
+  "name": "resnet_x3px_none_c32_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x3px_none_c32_b6",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x3px_none_c48_b2",
+  "reason": "proxy-estimated logrows 27 > 25"
+ },
+ {
+  "name": "resnet_x3px_none_c48_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ },
+ {
+  "name": "resnet_x3px_none_c64_b2",
+  "reason": "proxy-estimated logrows 28 > 25"
+ },
+ {
+  "name": "resnet_x3px_none_c64_b4",
+  "reason": "seed-0 training diverged or ended at chance level (top1<15)"
+ }
+]

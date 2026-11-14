@@ -1,0 +1,21 @@
+\begin{table}[h]
+\centering
+\caption{Budget-constrained search under \emph{ezkl-calibrated} budgets ($\logrows\le B$ from calibration of trained
+  networks).  Each of 300 random $50/50$ splits of the pool tunes $\lambda\in\{0,0.25,0.5,1,2,4\}$ for the joint
+  proxy on one half and evaluates all methods on the other, choosing $K{=}10$ architectures to train; the outcome is the
+  best accuracy among them.  Entries are mean regret in accuracy points against the best architecture in the
+  evaluation half, with the $2.5$--$97.5$ percentile range over splits; Random averages $50$ draws per split.  Last
+  column: splits where Joint beats / ties / loses to NEAR-only (regret).}
+\label{tab:search}
+\small
+\begin{tabular}{rrrrrrrr}
+\toprule
+\textbf{$\logrows$} & \textbf{pool} & \textbf{oracle} & \textbf{Joint} & \textbf{NEAR-only} & \textbf{ZK-cost-only} & \textbf{Random} & \textbf{J v N} \\
+\midrule
+$\le20$ & 36 & 65.4 & 0.02 {\scriptsize[0.00,0.00]} & 0.02 {\scriptsize[0.00,0.00]} & 1.77 {\scriptsize[0.00,5.17]} & 1.58 {\scriptsize[0.44,3.15]} & 0/300/0 \\
+$\le21$ & 72 & 71.3 & 0.04 {\scriptsize[0.00,0.00]} & 0.04 {\scriptsize[0.00,0.00]} & 7.10 {\scriptsize[0.45,13.86]} & 4.18 {\scriptsize[1.59,6.96]} & 0/300/0 \\
+$\le22$ & 111 & 82.5 & 0.33 {\scriptsize[0.00,3.50]} & 0.33 {\scriptsize[0.00,3.50]} & 19.07 {\scriptsize[10.59,25.09]} & 7.47 {\scriptsize[4.53,11.10]} & 0/300/0 \\
+$\le23$ & 175 & 82.5 & 3.39 {\scriptsize[0.00,7.34]} & 3.61 {\scriptsize[0.00,7.34]} & 19.35 {\scriptsize[11.50,26.02]} & 8.63 {\scriptsize[4.97,11.92]} & 19/280/1 \\
+\bottomrule
+\end{tabular}
+\end{table}

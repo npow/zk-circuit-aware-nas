@@ -3,54 +3,48 @@
 **ZK-Circuit-Aware NAS: A Cost Model, Benchmark, and Proxy Study for Provable Inference**
 (paper source: `paper/main.tex`)
 
-A structural cost model for zero-knowledge circuit size, a NAS benchmark spanning ReLU and
-polynomial activations, and a study of zero-cost proxies on it. All numbers below are
-measured with ezkl 9.5.0 unless stated.
+A cost model for ezkl circuit size evaluated against ezkl calibrations of trained networks, a CIFAR-10 NAS benchmark of
+474 networks (ReLU, x^2, x^3+x, x^2+x activations; no/Layer/Group normalization; MLP, CNN, DWS-CNN, ResNet-style) with two
+training seeds, and a study of zero-cost proxies on it. Everything is measured with ezkl 9.5.0 unless stated.
 
-## Results (what the repository can reproduce)
+## What the repository reproduces
 
-| Result | Value | Script / file |
+| Paper element | Script | Data |
 |---|---|---|
-| Proxy-estimated vs ezkl-calibrated logrows, 73 architectures (untrained weights) | exact 49/73, within one 66/73, Spearman 0.80 (95% CI 0.65-0.91); x^3+x family only 0.28 | `validate_proxy_vs_ezkl.py`, `analyze_proxy_vs_ezkl.py`, `results/proxy_vs_ezkl*.json` |
-| Width-matched ReLU vs x^2 circuit size (5 skeletons x 3 seeds) | same calibrated logrows in all 15; x^2 has 0.2-6% more assigned cells; seeds identical | `matched_width_activation_cost.py`, `results/matched_width_activation*.json` |
-| x^3+x networks | calibrate to logrows 23 in all 5 unnormalized skeletons x 3 seeds (assignments unchanged); with LayerNorm/GroupNorm they range 21-26 in the 73-architecture set | same |
-| Real proving, 3 architectures | 47-58s (small polynomial MLPs), 1340s (DWS ReLU, logrows 21); single runs | `measure_verify.py`, `results/prove_verify_times.json` |
-| 30 vs 100 epoch ranking, 26 architectures x 3 seeds | Spearman 0.932; selected 75.0% pick reproduces at 74.73+-1.61% | `gpu_validation_experiment.py`, `results/gpu_validation_summary.json` |
+| Sweep (accuracy, 2 seeds; proxies and cost estimate at seed-0 init) | `sweep_gpu.py` | `results/sweep/*.jsonl` |
+| ezkl calibration of trained seed-0 networks with real CIFAR-10 inputs, with ONNX-op features | `calibrate_trained.py` | `results/trained_calibration.jsonl`, `results/trained_calibration_skipped.json` |
+| ezkl timings and quantized accuracy on trained networks | `time_ezkl.py` | `results/ezkl_timing_trained.jsonl` |
+| Width-matched activation comparison, untrained (3 seeds) | `matched_width_activation_cost.py` | `results/matched_width_activation*.json` |
+| All sweep statistics (correlations, partial correlations, search, cost-model fit) | `analyze_sweep.py` | `results/sweep_summary.json` |
+| LaTeX tables and numbers in the prose | `make_tables.py`, `render_results.py` | `paper/tables/`, `paper/results_auto.tex` |
 
-A claim in an earlier version of this work, that ReLU is much more expensive than x^2 in
-ezkl, is **not supported** by the width-matched measurement above and has been withdrawn.
+Regenerate the statistics and the tables from the released data (no GPU or ezkl needed):
+
+```bash
+python analyze_sweep.py --sweep results/sweep --calib results/trained_calibration.jsonl --out results/sweep_summary.json
+python make_tables.py && python render_results.py
+```
+
+## Main findings
+
+- **Cost model** (Eq. 1 in the paper): fitted by non-negative least squares on trained, calibrated networks and evaluated on a disjoint split; about one assigned cell per multiply-accumulate and no per-node overhead; weak agreement for x^3+x networks.
+- **Negative result**: width-matched, ReLU and x^2 networks have the same calibrated logrows (untrained and trained). A claim in an earlier version that ReLU is much more expensive than x^2 is withdrawn.
+- **Proxies**: NEAR predicts accuracy only on ReLU networks; ZenNAS is anti-correlated; a pre-activation-sign NASWOT variant is negatively correlated on polynomial networks; ZiCo's success on x^3+x disappears when failed runs are removed. 38-60% of polynomial networks fail to train.
+- **Search**: under ezkl-calibrated budgets a tuned joint proxy is indistinguishable from NEAR-only (an earlier claim of a gain is withdrawn).
 
 ## Not included
 
-The per-architecture sweep files behind the proxy-correlation tables (n=335 CIFAR-10,
-n=84 CIFAR-100, ImageNet-16-120) and the budget-search table, and the raw output of the
-multi-seed GPU job, are not in this repository. `generate_sweep.py` generates the sweep
-configurations; `results/proxy_sweep_correlations.json` holds the CIFAR-10 correlations.
+Trained weights (about 2 GB), the raw output of the earlier three-seed 100-epoch job (only `results/gpu_validation_summary.json` is included), and CIFAR-100 / ImageNet-16-120 sweeps (withdrawn: the files could not be recovered). The `results/legacy/` directory holds files from an
+earlier version of this work; they are superseded and are not used by the current paper.
 
-## Quick start
+## Notes
+
+- `results/proxy_vs_ezkl*.json`: an earlier comparison of the proxy with ezkl on untrained networks (73 architectures); superseded by the trained-network calibration above.
+- The `--clamp` option of `matched_width_activation_cost.py` mirrors `_wrap_poly_model_for_export`, which only wraps classes whose name contains "activation"; the sweep's `Square`, `CubicPlusLinear` and `SquarePlusLinear` do not match, so both settings produce identical, unclamped exports.
+- `sweep_gpu.py` keeps the original training recipe but holds the dataset and augmentation on the GPU; the polynomial MLP x^2+x scores about 3 points higher than in the earlier CPU pipeline.
+
+## Install
 
 ```bash
 pip install -e ".[dev,ezkl]"
-python validate_proxy_vs_ezkl.py --n 64 --workers 4 --out results/proxy_vs_ezkl.json
-python matched_width_activation_cost.py --out results/matched_width_activation.json
-python matched_width_activation_cost.py --clamp none --out results/matched_width_activation_noclamp.json
-python matched_width_activation_cost.py --seed 1 --out results/matched_width_activation_seed1.json   # and --seed 2
-python analyze_proxy_vs_ezkl.py
 ```
-
-## Structure
-
-```
-src/zkml_bench/metrics/zk_proxy.py        structural ZK cost proxy
-src/zkml_bench/nas/zero_cost_proxies.py   NEAR, Synflow, ZiCo, MeCo, ZenNAS, NASWOT
-generate_sweep.py                         architecture sweep generator
-validate_proxy_vs_ezkl.py                 proxy vs ezkl-calibrated logrows
-matched_width_activation_cost.py          width-matched activation comparison
-docs/                                     working notes; the paper is authoritative where they differ
-```
-
-## Notes on the matched-width experiment
-
-The `--clamp` option mirrors `_wrap_poly_model_for_export`, which only wraps classes whose
-name contains "activation"; the sweep's `Square`, `CubicPlusLinear` and `SquarePlusLinear`
-classes do not match, so both settings produce identical, unclamped exports.

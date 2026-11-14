@@ -1,0 +1,21 @@
+\begin{table}[h]
+\centering
+\caption{ezkl timings on trained seed-0 networks with real CIFAR-10 inputs under one recorded configuration
+  (ezkl 9.5.0, AMD Ryzen Threadripper PRO 3945WX 12-Cores, 24 logical cores, shared host).  Median [min,max] over
+  repeats; seconds.  Mock proofs: $\times3$.  Real proofs: $\times3$ for $\logrows<20$, $\times1$ for $\logrows\in\{20,21\}$, not run for $\logrows\ge22$.  Last column: quantized-circuit predictions that agree with the float model on real test images.}
+\label{tab:ezkl}
+\scriptsize
+\begin{tabular}{lrrrrrrr}
+\toprule
+\textbf{Architecture} & \textbf{top-1 (2 seeds)} & $\logrows$ & \textbf{mock} & \textbf{prove} & \textbf{verify} & \textbf{proof KB} & \textbf{q-agree} \\
+\midrule
+mlp\_x2px\_none\_128x64x32 & 54.5 & 19 & 2.3 {\scriptsize[2.2,2.3]} & 25.3 {\scriptsize[25.2,25.3]} & 0.18 {\scriptsize[0.17,0.19]} & 15.4 & 100/100 \\
+mlp\_x2px\_layernorm\_128x64x32 & 56.5 & 19 & 3.1 {\scriptsize[3.1,3.7]} & 49.9 {\scriptsize[49.9,51.0]} & 0.10 {\scriptsize[0.10,0.11]} & 27.2 & 100/100 \\
+dws\_relu\_none\_16\_32\_64 & 65.4 & 20 & 13.7 {\scriptsize[13.4,14.0]} & 174.5 & 0.18 & 29.0 & 100/100 \\
+dws\_relu\_none\_32\_64\_128 & 71.3 & 21 & 26.9 {\scriptsize[26.8,27.2]} & 349.6 & 0.35 & 29.0 & 100/100 \\
+dws\_relu\_none\_32\_64\_128\_256 & 75.8 & 22 & 42.3 {\scriptsize[42.1,42.4]} & -- & -- & -- & 100/100 \\
+cnn\_relu\_none\_16\_32\_64 & 77.9 & 22 & 37.3 {\scriptsize[37.1,37.4]} & -- & -- & -- & 100/100 \\
+cnn\_relu\_none\_16\_32\_64\_128 & 82.5 & 22 & 40.3 {\scriptsize[39.9,40.4]} & -- & -- & -- & 100/100 \\
+\bottomrule
+\end{tabular}
+\end{table}

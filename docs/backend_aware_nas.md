@@ -2,7 +2,7 @@
 
 **Date**: 2026-05-25  
 **Setup**: 3 iterations, 1 epoch mini-train on 2000 MNIST samples  
-**Hardware**: CPU-only (Netflix Workbench)  
+**Hardware**: CPU-only workstation  
 
 ## The System Contribution
 

@@ -55,41 +55,19 @@
 % ============================================================
 \begin{abstract}
 % ============================================================
-Deploying neural networks in zero-knowledge (ZK) proof systems requires
-co-optimizing for both accuracy and circuit complexity --- yet existing Neural
-Architecture Search (NAS) methods treat these objectives independently.  We
-make three contributions.  First, we show that, for fixed quantization and lookup-range settings,
-the ZK circuit layout depends only on the architecture and not on the weights, so
-a cost model can be evaluated before any training (Theorem~\ref{thm:det}); on
-73 architectures the model matches ezkl-calibrated logrows exactly for 49 and within one for 66
-(Spearman $\rho=0.80$, 95\% CI $[0.65,0.91]$; $\rho=0.92$--$0.94$ for ReLU, $x^2$ and $x^2{+}x$
-families but only $0.28$ for $x^3{+}x$).
-We further show that FLOPs does not determine ZK cost: for equal
-multiply-accumulate counts the cost ratio between activation types is set by
-the per-activation circuit cost and the layer fan-in (Theorem~\ref{thm:sep}).
-Second, we introduce \textbf{zkml-bench}, the first NAS benchmark spanning
-polynomial activations ($x^2$, $x^3$, $x^2{+}x$), BN-free designs, and ZK
-proof time as a fitness metric.  We evaluate six zero-cost proxies against
-this benchmark and show: no single proxy works reliably across all activation
-families (NEAR $\rho{=}{+}0.828$ on our CIFAR-10 ReLU architectures and $+0.933$ on
-ImageNet-16-120, but $\rho{=}-0.089$ to $-0.624$ on $x^2$ --- same proxy,
-same code, activation type determines reliability; NASWOT, which scores ReLU
-activation patterns, is provably degenerate for $x^2$ (our implementation returns $-\infty$ on every
-polynomial network because it finds no ReLU modules, so the sweep does not test the proof); ZenNAS is anti-correlated in every
-family, with a scaling argument in Proposition~\ref{prop:zen}), while the structural cost proxy tracks ezkl
-logrows at $\rho{=}0.80$.  Third, a width-matched ezkl measurement
-gives a negative result for a common assumption: ReLU and $x^2$ networks have nearly identical
-circuit sizes (equal logrows; $x^2$ has at most $6\%$ more assigned cells), so activation choice is not
-the dominant cost driver at these widths, while $x^3{+}x$ networks calibrate to
-$\logrows{=}23$ in all unnormalized skeletons we tried.  Using the cost model, within a budget of at most $2^{21}$ estimated circuit constraints
-(structural-proxy $\logrows \le 21$), joint-proxy-guided search selects a
-$75.0\%$ CIFAR-10 architecture versus $62.8\%$ for random selection ($+12.2$ points),
-using $20\times$ fewer constraints than the most accurate ReLU baseline; note that
-ezkl calibration places this particular architecture at $\logrows{=}22$
-(Table~\ref{tab:ezkl}).  A targeted validation of
-26 architectures under three seeds confirms that 30-epoch rankings predict
-independently trained 100-epoch rankings ($\rho=0.932$); the selected
-$75.0\%$ architecture reproduces at $74.7\%\mathbin{\pm}1.6\%$.
+Choosing a network architecture for zero-knowledge (ZK) proofs of inference needs a circuit-cost estimate that
+can be checked against the prover, yet NAS work on ZK has relied on untested cost proxies.  We study ezkl, a Halo2-based prover, on
+CIFAR-10 MLPs, CNNs and ResNet-style networks.  \textbf{(1) Cost model.}  A parametric model of assigned cells, with coefficients fitted on 187 trained, calibrated networks
+and evaluated on 56 held-out ones, matches ezkl-calibrated $\logrows$ exactly for 43 and within one for 53
+(Spearman 0.86); the fitted coefficients are about one cell per multiply-accumulate and no per-node overhead, and agreement is weak for $x^3{+}x$ networks.
+\textbf{(2) A negative result.}  Width-matched, ReLU and $x^2$ networks have the same calibrated $\logrows$ (all 5 skeletons; 47 of 52 matched pairs in the sweep), contradicting the assumption
+that polynomial activations are cheaper to prove in ezkl; unnormalized $x^3{+}x$ networks calibrate to a circuit up to $16\times$ larger at equal cell count.
+\textbf{(3) Benchmark.}  We release zkml-bench, 474 networks with two training seeds and proxy scores.  NEAR predicts accuracy only for ReLU networks
+($\rho=+0.70$) and is indistinguishable from zero on all three polynomial families; ZenNAS is anti-correlated everywhere; a sign-pattern NASWOT variant is negatively correlated on polynomial networks;
+ZiCo's apparent success on $x^3{+}x$ disappears once failed training runs are removed.  Between 38\% and 60\% of polynomial networks fail to train.
+\textbf{(4) Search.}  With budgets set on ezkl-calibrated circuit size, a tuned joint accuracy-cost proxy is indistinguishable from NEAR-only, which beats random selection by a wide margin; we
+withdraw an earlier claim of a joint-proxy gain.  Filtering by the cost model's estimate removes most but not all budget violations.
+Scope: CIFAR-10, one ezkl version, calibration on trained networks with real inputs, no proving-time claim beyond a few architectures.
 \end{abstract}
 
 % ============================================================
@@ -101,59 +79,32 @@ $75.0\%$ architecture reproduces at $74.7\%\mathbin{\pm}1.6\%$.
 ZK-ML systems (ezkl, Orion, RISC Zero) let anyone prove neural network
 inference was correct --- without revealing inputs.  This enables private
 biometric verification (e.g., Worldcoin), on-chain AI oracles, and
-compliant ML auditing.  But proving is slow: in our measurements, real proving
-time ranges from under a minute ($47$--$58$s) to over twenty minutes ($1340$s)
-depending on architectural choices that practitioners cannot currently predict.
+compliant ML auditing.  But proving is slow, and its cost depends on architectural choices that are hard to predict: in our measurements real
+proving time ranges from $25$\,s to $350$\,s over the four trained networks we proved (Table~\ref{tab:ezkl}).
 
 \paragraph{What we show empirically.}
-Real proving time in our measurements ranges from under a minute to over twenty minutes
-depending on the architecture (Table~\ref{tab:ezkl}).  A width-matched comparison
-(Table~\ref{tab:matched}) shows that this spread does not come from the ReLU-versus-$x^2$
-choice: at identical widths the two have the same calibrated $\logrows$ and $x^2$ has
-at most $6\%$ more assigned cells.  The spread in our sweep comes from layer type and width, and from
-ezkl's range calibration, which raises $\logrows$ for $x^3{+}x$ networks.  We therefore report a
-negative result for the assumption that polynomial activations are cheaper to prove in ezkl.
-Choosing DWS+ReLU over a standard CNN reduces single-run mock-proof time from $1119$s to
-$534$s at a cost of $6.6$ accuracy points ($75.0\%$ vs.\ $81.6\%$).  The most accurate ReLU
-architecture we evaluated needs $\logrows{=}25$ ($2^{25}$ rows), and we recorded no
-mock-proof result for it.
+Real proving time varies by more than an order of magnitude across the four trained networks we proved (Table~\ref{tab:ezkl}).  A width-matched comparison
+(Tables~\ref{tab:matched} and~\ref{tab:matchedtrained}) shows that this spread does not come from the ReLU-versus-$x^2$ choice: at identical widths the two have the same calibrated $\logrows$
+(in all five skeletons, and in 47 of 52 matched pairs across the trained sweep).  Differences come from layer type, width, and from ezkl's range calibration, which raises $\logrows$ for unnormalized
+$x^3{+}x$ networks.  We therefore report a negative result for the assumption that polynomial activations are cheaper to prove in ezkl.  We also report that the zero-cost proxies we tested do not
+predict accuracy across activation families, that polynomial networks often fail to train, and that, under budgets set on calibrated circuit size, a joint accuracy-cost proxy does no better than NEAR alone.
 
 \paragraph{Why this requires NAS.}
-Architecture search for ZK inference needs to jointly optimize accuracy and
-circuit cost --- but no NAS method, proxy, or benchmark treats ZK cost as a
-fitness metric.  We show that no single standard zero-cost proxy works
-reliably across all polynomial activation families: NEAR swings from
-$\rho{=}{+}0.83$ (our CIFAR-10 ReLU architectures) to $\rho{=}-0.089$ (our $x^2$
-architectures), ZenNAS is anti-correlated in every family (pooled
-$\rho{=}-0.55$), and NASWOT, which scores binary ReLU activation patterns, is
-degenerate on polynomial activations (provably so for $x^2$).  While ZiCo partially works for $x^3{+}x$ architectures
-($\rho{=}{+}0.54$), it fails for $x^2{+}x$ ($\rho{=}-0.04$) --- no proxy
-generalizes.
+Architecture search for ZK inference needs to trade accuracy against circuit cost, and cost estimates must be validated against the prover.  We evaluate a cost model against ezkl calibrations of trained networks
+and evaluate six zero-cost proxies, plus a NASWOT variant, on a benchmark that includes polynomial and BN-free networks, where the standard proxies were not designed to work.
 
 \paragraph{Our contributions.}
 \begin{enumerate}
-\item \textbf{Theory}: for fixed quantization and lookup-range settings, the
-  circuit layout is a function of the architecture alone, so a cost model is
-  available at initialization time (Theorem~\ref{thm:det}).  FLOPs does not
-  determine ZK cost (Theorem~\ref{thm:sep}).  A scaling argument explains ZenNAS's anti-correlation for polynomial
-  activations (Proposition~\ref{prop:zen}).
-
-\item \textbf{Benchmark}: First NAS benchmark covering polynomial activations
-  $\times$ BN-free designs $\times$ 3 datasets (CIFAR-10/100/ImageNet-16-120),
-  with the cost model compared against ezkl-calibrated logrows.
-
-\item \textbf{Measurements}: a width-matched ezkl comparison (ReLU $\approx$
-  $x^2$ in circuit size; $x^3{+}x$ calibrates to $\logrows{=}23$), and a
-  proxy-versus-ezkl comparison on $73$ architectures (exact for $49$, within one for $66$).
-
-\item \textbf{Application}: Joint proxy finds $75.0\%$ accuracy
-  ($+12.2$ points vs.\ random) within a $2^{21}$ estimated-constraint budget
-  (ezkl-calibrated $\logrows{=}22$ for the selected architecture).
+\item \textbf{Cost model with a held-out evaluation} (Section~\ref{sec:theory}, Table~\ref{tab:costfit}): a parametric model of assigned cells, fitted on 187 trained, calibrated networks and evaluated on 56 disjoint ones.
+\item \textbf{Measurements} (Sections~\ref{sec:findings} and~\ref{sec:ezkltrained}): a width-matched ReLU $\approx$ $x^2$ result replicated on untrained and trained networks, and the $x^3{+}x$ calibration effect.
+\item \textbf{Benchmark and proxy study} (Section~\ref{sec:results}): 474 networks, two seeds, per-architecture results released; proxy correlations with Holm-adjusted significance, confidence intervals,
+  partial correlations, and analyses with and without failed networks and with a common training recipe.
+\item \textbf{Search under calibrated budgets} (Section~\ref{sec:results}): a protocol with a tuning/evaluation split; the joint proxy does not beat NEAR-only, and the cost model's estimate removes most budget violations.
 \end{enumerate}
 
 \paragraph{Paper organization.}
 Section~\ref{sec:background} reviews ZK-SNARK cost and contrasts with MPC.
-Section~\ref{sec:theory} presents the theoretical results.
+Section~\ref{sec:theory} states the cost model and the proxy analysis.
 Section~\ref{sec:benchmark} introduces zkml-bench.
 Section~\ref{sec:findings} reports width-matched ezkl cost measurements.
 Section~\ref{sec:results} presents empirical results.
@@ -171,16 +122,17 @@ Section~\ref{sec:conclusion} concludes.
 In Halo2/PLONK over BN254 (as used by ezkl), the circuit is a rectangular
 table of $2^{\logrows}$ rows.  Cost is dominated by three components:
 \begin{itemize}
-  \item \textbf{Linear layers}: each multiply-accumulate contributes one
-    circuit row, giving $O(w_{\mathrm{in}} \times w_{\mathrm{out}})$ rows per
-    layer.
+  \item \textbf{Linear layers}: each multiply-accumulate contributes about one
+    assigned cell (fitted coefficient $\approx1$, Section~\ref{sec:results}), giving
+    $O(w_{\mathrm{in}} \times w_{\mathrm{out}})$ cells per layer.
   \item \textbf{Lookup-based activations}: non-linearities such as ReLU are
     evaluated through lookup tables whose size grows with the activation's integer
     range; the table is shared across the circuit.  At the widths we test, the
     resulting per-element cost is small relative to the multiply-accumulate rows
     (Section~\ref{sec:findings}).
-  \item \textbf{Polynomial activations} ($x^2$): a single degree-2 gate
-    constraint, costing $O(\mathrm{width})$ rows.
+  \item \textbf{Polynomial activations} ($x^2$): evaluated with multiplications and no lookup;
+    the fitted per-element cost of the power operator is of the same order as ReLU's
+    (Section~\ref{sec:results}).
 \end{itemize}
 For a fixed quantization scale and lookup range, the circuit structure is
 determined at compile time from the architecture specification and does not
@@ -193,193 +145,121 @@ our cost model therefore predicts the circuit size up to this calibration effect
 CryptoNAS~\citep{ghodsi2020cryptonas} optimizes for MPC (garbled circuits).
 In MPC: linear layers cost $O(1)$ via secret sharing (effectively free), while
 ReLU requires oblivious transfer (expensive).  In ZK-SNARKs, linear layers are
-\emph{not} free.  An architecture with half the ReLU count but double channel
-width is $2\times$ cheaper in MPC but identical in ZK cost.  CryptoNAS
-results do not transfer to ZK deployment.
+\emph{not} free: multiply-accumulates dominate the assigned cells at the widths we test
+(Section~\ref{sec:findings}), so an architecture chosen to minimize the ReLU count need not be cheap to prove.
+We do not evaluate CryptoNAS itself.
 
 
 % ============================================================
-\section{Theory}
+\section{Cost Model and Proxy Analysis}
 \label{sec:theory}
 % ============================================================
 
-\subsection{ZK Circuit Cost Determinism}
+This section states what we can and cannot establish about ezkl circuit size.  The
+claims are deliberately modest: Proposition~\ref{prop:cost} is a structural statement and
+a parametric form; its quantitative content is tested empirically in
+Sections~\ref{sec:findings} and~\ref{sec:results}, not proved.
 
-\begin{theorem}[ZK Circuit Cost Determinism]
-\label{thm:det}
-Fix a quantization scale and lookup range.  For a fully-connected or
-convolutional network with $L$ layers, activation types
-$\alpha = (\alpha_1,\ldots,\alpha_L)$, and width profile
-$W = (w_0,\ldots,w_L)$, the circuit layout (columns, selectors, lookup and
-permutation structure) is a function of $(L,\alpha,W)$ only and is independent
-of the weight values.  Consequently the row count admits the parametric form
+\subsection{A Parametric Cost Model}
+
+ezkl compiles an ONNX graph $G$ into a PLONKish circuit.  Fix the quantization scale $s$ and
+the lookup range $R$ (both are chosen by ezkl's calibration pass).  Each node $v$ has an operator
+type $o(v)$, input and output tensor shapes, and attributes (kernel size, stride, padding, groups).
+
+\begin{proposition}[Structure of the cost model]
+\label{prop:cost}
+For fixed $(s,R)$ the circuit layout (columns, selectors, lookup and permutation structure) is a
+function of the graph structure $(o(v),\text{shapes},\text{attributes})_{v\in G}$ only and does not
+depend on the weight values, which enter only as cell assignments.  Define
+$C(G;s,R)$ as the total number of assigned cells (ezkl's \texttt{total\_assignments}).  We use
+the parametric form
 \begin{equation}
-C(L,\alpha,W) \;=\; \sum_{i=1}^{L} w_i w_{i-1}
-  \;+\; \sum_{i=1}^{L} w_i\,\kappa(\alpha_i)
-  \;+\; \varepsilon(L,\alpha,W),
+C(G) \;=\; \sum_{v\in\mathcal{M}} \beta_{o(v)}\,\mathrm{MAC}(v)
+ \;+\; \gamma\,|\mathcal{M}|
+ \;+\; \sum_{v\notin\mathcal{M}} \alpha_{o(v)}\,\mathrm{el}(v)
+ \;+\; \varepsilon ,
+\label{eq:cost}
 \end{equation}
-where $\kappa(\alpha)$ is the per-element row cost of activation type $\alpha$
-(determined by the backend's compilation rule for $\alpha$, independent of
-weights) and $\varepsilon$ collects permutation and fixed per-node overhead.
-Here $C$ counts assigned cells (ezkl's \texttt{total\_assignments}); the circuit uses
-$2^{\lceil\log_2 C\rceil}$ rows, so $\logrows=\lceil\log_2 C\rceil$, up to the
-calibration-dependent adjustment of the scale and lookup range (which, in Section~\ref{sec:findings},
-does not occur for ReLU, $x^2$ and $x^2{+}x$ networks but does for unnormalized $x^3{+}x$).  $C$ is computable in $O(L\cdot\max(W))$ time
-before any training.
-\end{theorem}
+where $\mathcal{M}$ is the set of Gemm, MatMul and Conv nodes, with
+$\mathrm{MAC}=n_{\mathrm{in}}n_{\mathrm{out}}$ for a Gemm node and
+$\mathrm{MAC}=h'w'\,c_{\mathrm{out}}\,(c_{\mathrm{in}}/g)\,k_hk_w$ for a Conv node with output
+spatial size $h'\times w'$ and $g$ groups; $\mathrm{el}(v)$ is the number of output elements;
+$\beta_o,\gamma,\alpha_o\ge 0$ are coefficients; and $\varepsilon$ is an unmodelled residual.  The circuit has
+$2^{\logrows}$ rows with $\logrows=\lceil\log_2 C\rceil$ whenever calibration does not change $(s,R)$
+in a way that forces a larger table.
+\end{proposition}
 
-\begin{proof}
-The Halo2 \texttt{Circuit::configure} call that determines all column counts,
-selector polynomials, lookup arguments, and permutation structure takes only
-the architecture specification and the fixed quantization/range settings as
-input.  Weight values only populate advice columns at proving time and do not
-affect circuit structure.  Hence the number of rows consumed by each layer is
-a function of $(w_{i-1},w_i,\alpha_i)$; linear layers contribute one row per
-multiply-accumulate, and each activation contributes $\kappa(\alpha_i)$ rows
-per element, where $\kappa$ is a constant of the compilation rule.  The residual
-$\varepsilon$ is not given in closed form; we estimate it empirically (a fixed
-per-node overhead and a logrow snapping step), and Section~\ref{sec:results}
-evaluates the resulting model against ezkl.
-\end{proof}
+\paragraph{What is and is not claimed.}
+The first sentence of the proposition follows from how PLONKish layouts are built (weights are
+witness values), but we do not prove it for ezkl's implementation; it is the premise of the model.
+We do not derive the coefficients or the accounting from assigned cells to rows analytically.
+Instead the coefficients are \emph{fitted} by non-negative least squares on a fit split of
+trained, calibrated networks and \emph{evaluated} on a disjoint split (Section~\ref{sec:results}),
+and the identity $\logrows=\lceil\log_2 C\rceil$ is checked empirically for each activation family
+(Sections~\ref{sec:findings} and~\ref{sec:results}); it holds for ReLU, $x^2$ and $x^2{+}x$ networks
+and fails for $x^3{+}x$ networks, where calibration enlarges the circuit.  The structural proxy
+used by the search is the same form with hand-set coefficients; the fitted
+version is reported alongside it.  $\varepsilon$ is reported only through the fit residuals.
 
-\begin{corollary}[Initialization-Time Computability]
-Unlike latency (requires hardware measurement) or accuracy (requires training),
-the ZK cost model of Theorem~\ref{thm:det} can be evaluated at NAS time with no
-training and no hardware measurement.  Its agreement with ezkl is empirical
-(Section~\ref{sec:results}), not exact.
-\end{corollary}
+\subsection{Activation Costs at Equal Multiply-Accumulate Counts}
 
-\subsection{Complexity Separation}
-
-\begin{theorem}[FLOPs Does Not Determine ZK Cost]
-\label{thm:sep}
-Consider two networks with identical width profile $W$ (hence identical
-multiply-accumulate counts $M=\sum_i w_i w_{i-1}$) that differ only in
-activation type, with per-element costs $\kappa_A<\kappa_B$ and with the
-overhead $\varepsilon$ neglected.  Write $S=\sum_i w_i$ and
-$\bar f = M/S$ for the average fan-in.  Then the cost ratio is
+\begin{lemma}[Bounded ratio in the idealized model]
+\label{lem:ratio}
+Let two networks have identical width profile (hence identical $M=\sum_v\mathrm{MAC}(v)$ and
+element counts $S=\sum_i w_i$) and differ only in per-element activation cost, $\kappa_A<\kappa_B$,
+with all other terms of Eq.~\eqref{eq:cost} equal.  With $\bar f=M/S$ the average fan-in,
 \[
-\frac{C_B}{C_A} \;=\; \frac{\bar f+\kappa_B}{\bar f+\kappa_A},
+\frac{C_B}{C_A}=\frac{\bar f+\kappa_B}{\bar f+\kappa_A}\in\bigl(1,\kappa_B/\kappa_A\bigr),
 \]
-which lies strictly between $1$ and $\kappa_B/\kappa_A$ and tends to
-$\kappa_B/\kappa_A$ as $\bar f/\kappa_A\to 0$.  In particular, for any
-$\bar f\le\kappa_A$ we have $C_B/C_A\ge \kappa_B/(2\kappa_A)$.  Since the two
-networks have equal FLOPs, FLOPs cannot be a constant-factor approximation to
-ZK cost: the factor depends on $\kappa_B/\kappa_A$ and on the fan-in.
-\end{theorem}
+decreasing in $\bar f$.
+\end{lemma}
 
 \begin{proof}
-The cost ratio follows from dividing both costs $C_X = M + S\kappa_X$ by $S$.
-The ratio is a monotonically decreasing function of $\bar f$, equal to
-$\kappa_B/\kappa_A$ at $\bar f=0$ and tending to $1$ as $\bar f\to\infty$.  If
-$\bar f\le\kappa_A$ the numerator is at least $\kappa_B$ and the denominator at
-most $2\kappa_A$.
+Divide $C_X=M+S\kappa_X$ by $S$; the ratio is a decreasing function of $\bar f$ equal to
+$\kappa_B/\kappa_A$ at $\bar f=0$ and tending to $1$ as $\bar f\to\infty$.
 \end{proof}
 
-\begin{remark}
-In an idealized model where a lookup activation pays for a full table of $2^B$
-rows per element, $\kappa_B=2^B$ and the ratio can approach $2^B/d$ for a degree-$d$
-polynomial.  ezkl does not behave this way, and our width-matched measurements
-(Section~\ref{sec:findings}) find $\kappa_{\mathrm{ReLU}}\approx\kappa_{x^2}$ at the widths we
-test: $x^2$ networks have at most $6\%$ more assigned cells than ReLU networks and the same $\logrows$.  The
-separation that the theorem allows is therefore \emph{not} observed between ReLU and $x^2$ in
-ezkl.  It is a statement about the structure of the cost.  One place where cost differs at equal
-multiply-accumulate counts is the $x^3{+}x$ family, whose assignment counts match the others but whose
-calibrated $\logrows$ is $23$ in every unnormalized skeleton we tried; there the difference arises
-from ezkl's range calibration rather than from rows.
-\end{remark}
+The lemma is deliberately weak.  It shows that, in a model where activation costs are fixed
+constants, networks with equal MACs differ in cell count by at most $\kappa_B/\kappa_A$; it
+\emph{does not} show that FLOPs cannot approximate cell count within a constant factor (for fixed
+$\kappa$ it can).  Whether the factor is large is an empirical question: our measurements find
+$\kappa_{\mathrm{ReLU}}\approx\kappa_{x^2}$ (Section~\ref{sec:findings}).  The one place where
+equal-MAC networks differ substantially in ezkl is through calibration, not through cell count: unnormalized
+$x^3{+}x$ networks have the same assigned cells but a $\logrows$ larger by up to $4$, i.e.\ a circuit up
+to $2^4=16\times$ larger, than the other activations at the same width.  That is an observation
+about ezkl's calibration, and we state it as such.
 
 \subsection{Proxy Failure Modes for Polynomial Activations}
 
-\begin{proposition}[NASWOT Degeneracy for $x^2$ Activations]
+\begin{proposition}[NASWOT degeneracy for $x^2$ activations]
 \label{prop:naswot}
-For any network whose activations are $\sigma(t)=t^2$ (more generally $t^d$ with
-$d$ even), the NASWOT score $\log|\det(K)|$ computed on the binary patterns
-$\mathbf{1}[\sigma(\cdot)>0]$ is $-\infty$ for every architecture.
+For any network whose activations are $\sigma(t)=t^2$ (more generally $t^d$ with $d$ even), the
+Gram matrix $K$ of the binary patterns $\mathbf{1}[\sigma(\cdot)>0]$ used by NASWOT has rank one on
+almost every input set, so $\log|\det K|$ is degenerate.
 \end{proposition}
 
 \begin{proof}
-NASWOT computes $K_{ij} = \langle h_i, h_j \rangle$ where
-$h_i^{(\ell)} = \mathbf{1}[\sigma(W^{(\ell)} x_i) > 0]$ is the binary
-activation pattern.  For $\sigma(t) = t^2$: since $t^2 \ge 0$ always, the
-indicator $\mathbf{1}[t^2 > 0] = 1$ for all non-zero inputs (almost surely
-under continuous random inputs).  Therefore all samples map to the all-ones
-binary code: $h_i^{(\ell)} = \mathbf{1}$ for all $i$.  The kernel matrix $K$
-becomes rank-1, so $\det(K) = 0$, and $\log|\det(K)| = -\infty$ for every
-architecture with even-degree pure-power activations.
+For $\sigma(t)=t^2$ the indicator $\mathbf{1}[t^2>0]$ equals one for every non-zero value, which
+holds almost surely under continuous random inputs.  Every sample therefore maps to the all-ones code,
+$K$ is the all-ones matrix, and $\det K=0$.
 \end{proof}
 
-\begin{remark}
-The argument does not cover $x^3{+}x$ or $x^2{+}x$, whose sign patterns are not
-constant.  Our NASWOT implementation scores the binary outputs of
-\texttt{nn.ReLU} modules and returns $-\infty$ when a network contains none, which
-is the case for every polynomial architecture in the sweep.  The $-\infty$
-counts for all $272$ polynomial networks (including the $79$ $x^2$ ones) therefore reflect that the
-implementation has no ReLU patterns to score; they do not test the proposition, which is a
-statement of mathematics only, and they are not a proof of degeneracy for $x^3{+}x$ or $x^2{+}x$; we did not evaluate a
-generalization of NASWOT that uses the sign patterns of polynomial pre-activations.
-\end{remark}
+\paragraph{Remarks.}
+(i) The proposition is mathematics only: standard NASWOT scores the outputs of \texttt{nn.ReLU}
+modules and returns $-\infty$ for any network without them, so the $-\infty$ counts in our sweep
+(all polynomial networks, including the pure-$x^2$ ones) are produced by the implementation and do
+not test the proposition.  (ii) The argument does not cover $x^3{+}x$ or $x^2{+}x$, whose sign patterns are not
+constant.  (iii) To avoid the confound we also evaluate a heuristic generalization that records
+$\mathbf{1}[\text{pre-activation}>0]$ at the input of every activation module; for ReLU it equals the
+standard score, and for polynomial networks it is defined.  This variant is not part of the NASWOT paper.
 
-\begin{proposition}[ZenNAS Score Inflation for Polynomial Activations]
-\label{prop:zen}
-For a network with polynomial activation $\sigma(t) = t^d$ ($d \ge 2$) and
-$L$ polynomial activation layers, the Zen score satisfies:
-\[
-\mathrm{Zen}(f) = \Theta(d^L \cdot \log \sigma_x),
-\]
-where $\sigma_x$ is the input scale.  This quantity is a function of
-architectural scale $(d, L,$ weight norms$)$, not of classification accuracy.
-By this scaling argument, ZenNAS cannot distinguish a large, unstable
-polynomial network from an accurate small one, which would produce the anti-correlation with
-accuracy we observe in BN-free settings.
-\end{proposition}
-
-\begin{proof}[Proof sketch]
-For $\sigma(t) = t^d$, a network output magnitude scales as
-$\mathbb{E}[\|f(x)\|_2] = \Theta(\sigma_x^{d^L})$ (verified numerically:
-slope $2.00$ for $d=2$, $L=1$; slope $4.00$ for $d=2$, $L=2$; slope $2.96$
-for $d=3$, $L=1$).  Both terms of the Zen score grow as
-$\Theta(d^L \cdot \log \sigma_x)$.  The same super-exponential scaling
-$d^L$ that inflates the Zen score causes gradient magnitude explosion:
-$\|\nabla_{W_1} \mathcal{L}\| \sim d^L \cdot \sigma_x^{d^L - 1}$.
-Architectures with the highest Zen scores (large, deep polynomial networks)
-have training failure rates of $56$--$57\%$ (Table~\ref{tab:zen}), anchoring
-those architectures at near-random accuracy ($10\%$).  Without batch
-normalization to re-scale outputs to unit variance, output magnitude is
-anti-informative: the architectures ZenNAS ranks highest are the ones least
-likely to train successfully.
-\end{proof}
-
-\subsection{Theory-Empirical Connections}
-
-Table~\ref{tab:theory} summarises the four theoretical predictions and their
-empirical confirmations.  The NASWOT row checks an algebraic fact for $x^2$ networks and the others are
-empirical agreement, not proofs of exactness.
-
-\begin{table}[h]
-\centering
-\caption{Theory-empirical connections.}
-\label{tab:theory}
-\small
-\begin{tabular}{llll}
-\toprule
-\textbf{Result} & \textbf{Prediction} & \textbf{Empirical confirmation} \\
-\midrule
-Theorem~\ref{thm:det} (cost determinism)
-  & Structural model tracks ezkl circuit size
-  & exact logrows for $49/73$, within one for $66/73$; $\rho=0.80$ vs.\ ezkl logrows \\
-Theorem~\ref{thm:sep} (FLOPs does not determine cost)
-  & Ratio $=(\bar f+\kappa_B)/(\bar f+\kappa_A)$
-  & ReLU vs.\ $x^2$: $1.00$--$1.06\times$ cells (no separation); unnormalized $x^3{+}x$: same cells, $\logrows$ up $1$--$4$ \\
-Proposition~\ref{prop:naswot} (NASWOT degeneracy)
-  & $-\infty$ for $x^2$ networks
-  & Implementation returns $-\infty$ on all $272$ CIFAR-10 polynomial networks, including the $79$ $x^2$ ones, because it finds no ReLU modules; this does not test the proposition \\
-Proposition~\ref{prop:zen} (ZenNAS inflation)
-  & Zen $\propto d^L \sigma_x$, anti-correlated
-  & ZenNAS $\rho=-0.545$ overall, negative in all 4 families \\
-\bottomrule
-\end{tabular}
-\end{table}
+\paragraph{Zen-NAS.}
+We implement the Zen score as $\mathrm{Zen}(f)=\mathbb{E}_{x,\epsilon}\log\|f(x+\epsilon)-f(x)\|_2
++\log\mathbb{E}\,[\operatorname{std}_{\text{batch}} f(x)]$ with $x\sim\mathcal{N}(0,I)$ and
+$\epsilon\sim\mathcal{N}(0,10^{-4}I)$.  In an earlier version we gave a scaling argument for its
+anti-correlation with accuracy on polynomial networks; because the inputs are fixed at unit
+scale the argument as stated is not well defined, so we withdraw it and instead report the
+empirical dependence of the score on depth, size and training failure (Section~\ref{sec:results}).
 
 
 % ============================================================
@@ -396,25 +276,22 @@ polynomial with better expressivity; $x^2{+}x$ approximates GELU-style
 behavior.
 
 \paragraph{Normalization.}
-$\{$none, LayerNorm, GroupNorm$\}$.  BatchNorm is excluded: it involves
-division by $\sqrt{\mathrm{variance}}$, which is expensive in ZK contrary to
-common assumption.
+$\{$none, LayerNorm, GroupNorm$\}$.  BatchNorm is excluded because its inference form
+divides by $\sqrt{\mathrm{variance}}$, which we expect to be costly in ZK but did not measure.
 
 \paragraph{Convolution type.}
 $\{$standard conv, depthwise separable (DWS)$\}$.  DWS reduces parameters
-and proportionally reduces circuit constraints.
+and multiply-accumulates.
 
 \paragraph{Architecture families.}
 MLP, CNN, ResNet-style with skip connections, DepthwiseSepConv-based.
 
 \subsection{Metrics}
 
-Evaluated on three datasets used by NAS-Bench-201~\citep{dong2020nasbench201}:
-CIFAR-10 ($n=335$, primary), CIFAR-100 ($n=84$), and ImageNet-16-120
-(16$\times$16 downsampled ImageNet, 120 classes).  Metrics are:
-\texttt{top1} (30-epoch accuracy), \texttt{constraints} (structural ZK cost
-proxy), \texttt{ezkl\_logrows} (actual logrows from ezkl calibration), and
-\texttt{ezkl\_mock\_time\_s} (mock proof time in seconds).
+Evaluated on CIFAR-10, the primary dataset of NAS-Bench-201~\citep{dong2020nasbench201} (earlier CIFAR-100 and ImageNet-16-120
+results are withdrawn; Section~\ref{sec:setup}).  Recorded per architecture:
+mean test top-1 accuracy after 30 epochs over two seeds, the zero-cost proxy scores and the structural cost estimate at the seed-0
+initialization, and, for the calibrated subset, ezkl's calibrated $\logrows$ and assigned cells on the trained network.
 
 \subsection{Zero-Cost Proxies Evaluated}
 
@@ -440,44 +317,37 @@ NASWOT   & \citet{mellor2021naswot}    & $\times$ & \textbf{No} (Proposition~\re
 
 \subsection{Algorithm: Joint Proxy-Guided ZK-ML NAS}
 
-Algorithm~\ref{alg:joint} describes our joint accuracy-cost proxy search,
-using Lagrangian scalarization:
+Algorithm~\ref{alg:joint} ranks candidate architectures by a scalarized score of an accuracy proxy and a
+circuit-cost estimate.  Both terms are $z$-scored within the candidate pool $\mathcal{P}$:
 \[
-J(a) = \mathrm{NEAR}(a) - \lambda \cdot \log\bigl(\ZKcost(a)\bigr),
+J(a) \;=\; z_{\mathcal{P}}\bigl(\mathrm{NEAR}(a)\bigr) \;-\; \lambda\; z_{\mathcal{P}}\bigl(\log_2 \hat C(a)\bigr),
 \]
-where $\lambda$ controls the accuracy-cost tradeoff.  Setting $\lambda=0$
-recovers pure accuracy prediction; $\lambda\to\infty$ minimizes cost only.
+where $\hat C(a)$ is the cell count from the cost model of Eq.~\eqref{eq:cost}.  $\lambda\ge0$ is \emph{not}
+fixed a priori: in the experiments it is chosen from $\{0,0.25,0.5,1,2,4\}$ by maximizing the best accuracy among the
+selected architectures on a tuning split that is disjoint from the evaluation split (Section~\ref{sec:results}).
+Setting $\lambda=0$ recovers NEAR-only selection.
 
 \begin{algorithm}[h]
 \caption{Joint Proxy-Guided ZK-ML NAS}
 \label{alg:joint}
 \begin{algorithmic}[1]
-\Require Candidate architectures $\mathcal{A} = \{a_1,\ldots,a_n\}$,
-         ZK budget $B$ (max $\logrows$), cost weight $\lambda$
-\Ensure Top-$k$ architectures for training
-\For{each $a \in \mathcal{A}$}
-  \State $C(a) \leftarrow \textsc{StructuralProxy}(a)$
-         \hfill $\triangleright$ $O(L \times W)$, no ezkl run, model of Theorem~\ref{thm:det}
-  \State $\logrows(a) \leftarrow \lceil\log_2 C(a)\rceil$
-  \If{$\logrows(a) > B$}
-    \State \textbf{skip} \hfill $\triangleright$ over budget
-  \EndIf
-  \State Normalize $\mathrm{NEAR}(a)$ and $\log C(a)$ to $[0,1]$
-         \hfill $\triangleright$ NEAR ranges $100$--$800$; $\log C$ ranges $13$--$20$
-  \State $J(a) \leftarrow \mathrm{NEAR}(a) - \lambda \cdot \log C(a)$
+\Require Candidate architectures $\mathcal{A}$, budget $B$ on $\logrows$, selection size $K$, weight $\lambda$
+\Ensure $K$ architectures to train
+\State $\mathcal{P}\leftarrow\{a\in\mathcal{A}:\ \logrows(a)\le B\}$
+       \hfill $\triangleright$ $\logrows$ \emph{estimated} by the cost model, or \emph{calibrated} by ezkl
+\For{each $a\in\mathcal{P}$}
+  \State compute $\mathrm{NEAR}(a)$ at initialization and $\log_2\hat C(a)$ from the cost model
 \EndFor
-\State \Return architectures sorted by $J(a)$, take top-$k$
+\State $J(a)\leftarrow z_{\mathcal{P}}(\mathrm{NEAR}(a))-\lambda\, z_{\mathcal{P}}(\log_2\hat C(a))$
+\State \Return the $K$ architectures with the largest $J$
 \end{algorithmic}
 \end{algorithm}
 
-\textbf{Key properties:} The structural proxy in step 2 is a deterministic,
-training-free cost model (Theorem~\ref{thm:det}) that matches ezkl-calibrated $\logrows$ exactly for $67\%$ of the
-architectures we checked and within one for $90\%$ (Section~\ref{sec:results}).  Normalization in step 6 is critical: without it,
-NEAR dominates entirely.  The budget constraint (step 4) is applied to the \emph{estimated}
-$\logrows$; the ezkl-calibrated value can be higher (the selected architecture
-in Table~\ref{tab:ezkl} is estimated at $21$ and calibrated at $22$).  Total cost:
-one model evaluation per candidate, vs.\
-an ezkl calibration or proof per candidate.
+\textbf{Properties.}  The cost term is a deterministic, training-free model (Proposition~\ref{prop:cost}); how closely it
+matches ezkl-calibrated $\logrows$ is measured in Section~\ref{sec:results}.  The budget in line~1 is applied either to the
+model's estimate or, when calibration has been run, to the calibrated $\logrows$; the search experiments use
+the latter, because the former can under- or over-estimate the circuit.  The cost is one NEAR evaluation and one cost-model
+evaluation per candidate, versus an ezkl calibration or proof per candidate.
 
 
 % ============================================================
@@ -527,22 +397,17 @@ differences between architectures in Table~\ref{tab:ezkl} therefore come from la
 choice, and the lowest-cost architectures in that table are small polynomial MLPs because
 they are small MLPs.
 
-\paragraph{Unnormalized $x^3{+}x$ networks calibrate to $\logrows{=}23$.}
+\paragraph{Unnormalized $x^3{+}x$ networks calibrate to a larger circuit.}
 In every unnormalized skeleton, in all three seeds, the $x^3{+}x$ network has about the same number of
 assignments as the others ($0.99$--$1.06\times$ ReLU) but is calibrated at $\logrows{=}23$, against $19$--$22$ for the
-other activations; ezkl's calibration also selected a lower input scale ($11$ versus $13$).  This
-does not hold for every $x^3{+}x$ network: in the $73$-architecture comparison of
-Section~\ref{sec:results} the four unnormalized $x^3{+}x$ networks are all at $23$, while the
-$13$ with LayerNorm or GroupNorm range from $21$ to $26$ (LayerNorm $22$--$24$, GroupNorm $21$--$26$).  We
-did not investigate the mechanism.  The data are consistent with large-range activation outputs forcing
-a larger circuit through calibration, but we did not test this.
+other activations; ezkl's calibration also selected a lower input scale ($11$ versus $13$).  At equal assigned cells this is a circuit
+$2^{1}$ to $2^{4}$ times larger.  On trained networks calibrated with real inputs (Section~\ref{sec:ezkltrained}), $20$ of the $25$ calibrated unnormalized
+$x^3{+}x$ networks in the sweep are at $23$ and the rest at $24$--$26$; with LayerNorm they range from $19$ to $26$.  We did not
+investigate the mechanism.  The data are consistent with large-range activation outputs forcing a larger circuit through calibration, but we did not test this.
 
-\paragraph{Runs are not always comparable.}
-Re-drawing weights and calibration data did not change any assignment count or $\logrows$ in
-Table~\ref{tab:matched}.  Separately, the same architecture can calibrate differently between the
-earlier run behind Table~\ref{tab:ezkl} and the fresh run in Table~\ref{tab:proxyezkl}; for example
-\texttt{dws\_relu\_none\_16$\times$32$\times$64} is at $\logrows{=}21$ in the earlier run and $20$ in the new
-one.  The earlier run's ezkl version, settings and weight state were not recorded, so we cannot say why.
+\paragraph{Repeated draws.}
+Re-drawing weights and calibration data (three seeds, untrained) did not change any assignment count or $\logrows$ in Table~\ref{tab:matched}, and
+Table~\ref{tab:matchedtrained} gives the same picture for trained networks and real inputs.
 
 \paragraph{Hypotheses we did not test.}
 From reading ezkl's circuit layout code (\texttt{ezkl/src/circuit/ops/layouts.rs}) we expect
@@ -552,321 +417,7 @@ measure these and make no claim about them.
 
 
 % ============================================================
-\section{Empirical Results}
-\label{sec:results}
-% ============================================================
-
-\subsection{Experimental Setup}
-
-\textbf{Architecture families:} MLP (2--4 hidden layers), CNN (2--4 conv
-layers), DWS (depthwise separable), ResNet-style.  All with AdaptiveAvgPool +
-linear classifier.
-
-\textbf{Training:} 30-epoch SGD ($\mathrm{lr}{=}0.1$ cosine decay,
-momentum$=0.9$, weight\_decay$=5{\times}10^{-4}$, batch\_size$=128$).
-Polynomial activation models without normalization use $\mathrm{lr}{=}0.01$
-with gradient clipping (clip$=1.0$) to prevent explosion.
-
-\textbf{ezkl validation:} Actual ezkl circuit compilation and mock proof times
-measured for the architectures of Table~\ref{tab:ezkl} in an earlier run whose ezkl version
-and settings were not recorded.  The calibration experiments of Sections~\ref{sec:findings}
-and~\ref{sec:results} use ezkl 9.5.0 with \texttt{calibrate\_settings} (\texttt{target=resources})
-and $20$--$40$ random calibration inputs.
-
-\textbf{Hardware:} The multi-seed validation (Section~\ref{sec:results}) used one NVIDIA A10G GPU.
-The ezkl calibration experiments of Sections~\ref{sec:findings} and~\ref{sec:results} ran on a
-24-core CPU workstation.  The hardware for the earlier mock- and real-proof timings was not recorded.
-
-\textbf{Robustness validation:} We additionally retrained 26 targeted CIFAR-10
-architectures on one NVIDIA A10G under seeds 42, 43, and 44.  The suite covers
-the eight architectures in Table~\ref{tab:ezkl} and activation-matched controls
-for ReLU, $x^2$, $x^3{+}x$, and $x^2{+}x$.  Each 30- and 100-epoch run starts
-from a fresh initialization and uses its own cosine schedule; the 30th epoch
-of a 100-epoch schedule is not reused as a 30-epoch result.  This targeted
-experiment is separate from the broader single-seed benchmark sweep.
-
-\subsection{Multi-Seed and Training-Budget Robustness}
-
-Table~\ref{tab:robustness} reports the direct replication of the eight central
-accuracy claims.  All values are test top-1 accuracy; multi-seed entries are
-mean $\mathbin{\pm}$ sample standard deviation over three seeds.  Every
-single-seed value is within $1.2$ percentage points of the corresponding
-three-seed 30-epoch mean.  In particular, the joint proxy's $75.0\%$ pick
-replicates at $74.73\%\mathbin{\pm}1.61\%$ and reaches
-$79.96\%\mathbin{\pm}0.40\%$ after 100 epochs.
-
-The activation-matched controls reinforce that activation effects are
-architecture-dependent.  ReLU remains the highest-accuracy choice in each
-matched convolutional group, while $x^2{+}x$ is the strongest polynomial
-alternative.  In the normalization-free MLP, however, $x^2{+}x$ reaches
-$55.67\%$ at 100 epochs versus $53.52\%$ for ReLU.  Pure-$x^2$ DWS controls
-remain at chance accuracy under both budgets, so polynomial activations should
-not be treated as interchangeable.
-
-\begin{table}[h]
-\centering
-\caption{Multi-seed replication and longer-training validation of the eight
-  architectures used in the accuracy/proving table.  ``Original'' is the
-  reported single-seed result; validation columns use fresh training runs.}
-\label{tab:robustness}
-\small
-\begin{tabular}{lrrr}
-\toprule
-\textbf{Architecture} & \textbf{Original 30 ep.} & \textbf{3-seed 30 ep.} & \textbf{3-seed 100 ep.} \\
-\midrule
-MLP $x^2{+}x$, none (128/64/32)       & $51.1$ & $50.67\mathbin{\pm}0.52$ & $55.67\mathbin{\pm}0.32$ \\
-MLP $x^2{+}x$, LN (128/64/32)         & $52.0$ & $50.87\mathbin{\pm}1.16$ & $54.10\mathbin{\pm}1.77$ \\
-DWS ReLU (16/32/64)                   & $62.9$ & $64.10\mathbin{\pm}0.52$ & $67.52\mathbin{\pm}1.12$ \\
-DWS ReLU (32/64/128)                  & $69.3$ & $70.48\mathbin{\pm}1.30$ & $75.70\mathbin{\pm}0.71$ \\
-DWS ReLU (32/64/128/256)              & $75.0$ & $74.73\mathbin{\pm}1.61$ & $79.96\mathbin{\pm}0.40$ \\
-CNN ReLU (16/32/64)                   & $77.1$ & $76.98\mathbin{\pm}0.72$ & $79.80\mathbin{\pm}0.46$ \\
-CNN ReLU (16/32/64/128)               & $81.6$ & $81.31\mathbin{\pm}0.53$ & $84.20\mathbin{\pm}0.32$ \\
-CNN ReLU (64/128/256)                 & $83.9$ & $83.96\mathbin{\pm}0.16$ & $86.25\mathbin{\pm}0.21$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Across all 26 architecture means, the 30- to 100-epoch Spearman correlation
-is $\rho=0.932$.  Across the 77 successful architecture-seed pairs it is
-$\rho=0.941$, and the three seed-wise correlations range from $0.929$ to
-$0.964$.  Absolute accuracy rises by $5.88$ percentage points on average, so
-the longer budget changes accuracy levels more than relative ordering.  The
-ordering is strong but not perfect: some deep polynomial CNNs learn late.
-Of 156 planned runs, 154 complete; both divergences are the same
-$x^3{+}x$ LayerNorm MLP under seed 44, once at each epoch budget, with a
-non-finite loss during epoch 1.
-
-\subsection{Proxy Correlations Across Activation Families}
-
-Table~\ref{tab:corr} shows Spearman $\rho$ between each proxy score and top-1
-accuracy, stratified by activation type ($n=335$ CIFAR-10 architectures).  The
-last two rows report the structural ZK-cost proxy separately against accuracy
-and against ZK cost, since these are different targets.
-
-\begin{table}[h]
-\centering
-\caption{Proxy correlation $\rho$ per activation family; all rows except the
-  last are correlations with top-1 accuracy.
-  All correlations are Spearman rank correlations.
-  N/A (degenerate) indicates our implementation returns $-\infty$ for all architectures
-  in that family because it finds no \texttt{nn.ReLU} modules to score (see the remark after
-  Proposition~\ref{prop:naswot}).
-  ${}^{*}$ $p < 0.05$.  ${}^{\dagger}$ The structural proxy and the sweep's
-  ZK cost are the same constraint count, so $\rho{=}1$ is an identity, not a
-  validation; the validation of the model is its agreement with ezkl-calibrated
-  logrows ($\rho=0.80$, $n=73$; Table~\ref{tab:proxyezkl}).  The structural proxy is a cost model, not an
-  accuracy predictor.}
-\label{tab:corr}
-\small
-\begin{tabular}{lrrrr}
-\toprule
-\textbf{Proxy}
-  & \textbf{ReLU} ($n{=}63$)
-  & \textbf{$x^2$} ($n{=}79$)
-  & \textbf{$x^3{+}x$} ($n{=}102$)
-  & \textbf{$x^2{+}x$} ($n{=}91$) \\
-\midrule
-NEAR        & $+0.828^*$  & $-0.089$   & $+0.026$   & $-0.014$   \\
-Synflow     & $+0.079$    & $-0.427^*$ & $+0.120$   & $-0.151$   \\
-ZiCo        & $+0.393^*$  & $+0.168$   & $+0.538^*$ & $-0.037$   \\
-MeCo        & $+0.416^*$  & $-0.035$   & $+0.034$   & $+0.064$   \\
-ZenNAS      & $-0.358^*$  & $-0.162$   & $-0.187$   & $-0.455^*$ \\
-NASWOT      & $+0.615^*$  & N/A (degenerate) & N/A (degenerate) & N/A (degenerate) \\
-Structural ZK cost vs.\ \emph{accuracy}
-            & $+0.650^*$  & $-0.206$   & $-0.246^*$ & $-0.146$   \\
-\textbf{Structural ZK cost vs.\ ZK cost}${}^{\dagger}$
-            & $+1.000^*$  & $+1.000^*$ & $+1.000^*$ & $+1.000^*$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\textbf{Key findings.}  (1) The structural proxy is not an accuracy predictor ($\rho=+0.65$ for ReLU and
-negative or insignificant for the polynomial families); its $\rho=1$ with
-sweep ZK cost is an identity.
-(2) NASWOT returns $-\infty$ for $272/272$ polynomial CIFAR-10 architectures ($0/63$
-for ReLU), consistent with Proposition~\ref{prop:naswot}.  (3) NEAR collapses from
-$+0.828$ (ReLU) to $-0.089$ ($x^2$) --- a complete failure on the ZK-ML
-design space.  (4) ZenNAS is the most consistently wrong proxy: negative
-$\rho$ in all four activation families.  (5) No single proxy works across all
-families.
-
-\subsection{Cross-Dataset Validation}
-
-\begin{table}[h]
-\centering
-\caption{NEAR cross-dataset comparison (same proxy, same code).}
-\label{tab:cross}
-\small
-\begin{tabular}{lrrrr}
-\toprule
-\textbf{Dataset} & \textbf{NEAR $\rho$ (ReLU)} & \textbf{NEAR $\rho$ ($x^2$)} & \textbf{Gap} \\
-\midrule
-Our CIFAR-10             & $+0.828^*$ & $-0.089$   & $0.917$ \\
-Our CIFAR-100            & N/A ($n{=}3$) & $-0.624^*$ & ---  \\
-Our ImageNet-16-120      & $+0.933^*$ & $-0.127$   & $1.060$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-The proxy failure appears on both datasets where each family has data.  NASWOT
-returns $-\infty$ on every polynomial architecture in our CIFAR-10 sweep ($272$); for $x^2$
-networks this is Proposition~\ref{prop:naswot}, and for the others it is because there
-are no ReLU patterns to score (see the remark after it).
-
-\subsection{ZenNAS Training Failure Analysis}
-
-\begin{table}[h]
-\centering
-\caption{ZenNAS score vs.\ training failure rate per architecture family.
-  High Zen scores correlate with training instability in BN-free polynomial networks.}
-\label{tab:zen}
-\small
-\begin{tabular}{lrrr}
-\toprule
-\textbf{Architecture family} & \textbf{Mean ZenNAS} & \textbf{Training failure rate} & \textbf{Mean accuracy} \\
-\midrule
-ResNet + $x^2$      & $+18.9$ & $57\%$ & $26.5\%$ \\
-ResNet + $x^2{+}x$  & $+17.1$ & $56\%$ & $27.9\%$ \\
-CNN + $x^2$         & $-11.2$ & $18\%$ & $42.2\%$ \\
-CNN + $x^2{+}x$     & $-8.8$  & $9\%$  & $54.2\%$ \\
-ReLU (all families) & $-10$ to $-13$ & $0\%$ & $52$--$69\%$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\subsection{Actual ezkl Mock and Real Proof Times}
-
-Table~\ref{tab:ezkl} reports measured ezkl results for key architectures.
-\emph{Mock time} is the time of ezkl's mock prover (witness generation plus
-constraint check), which does not produce a proof; \emph{prove time} is the time
-to generate a real proof and was measured only for the three architectures
-shown.  Each value is a single measurement; runs were not repeated and machine load was not
-recorded, so times should be read as orders of magnitude, and we do not
-claim that time is monotone in $\logrows$ or constraints (for example the
-$\logrows{=}21$ DWS network has a mock time of $272$s, similar to the
-$\logrows{=}22$ network at $256$s).  The reliable cost measure in this paper is
-the calibrated circuit size ($\logrows$ and constraints).
-
-\begin{table}[h]
-\centering
-\caption{ezkl measurements.  ``est.'' is the structural-proxy estimate of $\logrows$;
-  ``cal.\ (earlier)'' is ezkl's calibrated $\logrows$ from an earlier run whose weight
-  state was not recorded, with the mock/prove/verify times from that run; ``cal.\ (untrained)''
-  is a fresh calibration with random weights (Section~\ref{sec:results}).
-  Mock and prove times are single runs; a dash means the quantity was not measured
-  (prove and verify times exist only for three architectures).  No mock result was
-  recorded for the $\logrows{=}25$ architecture.}
-\label{tab:ezkl}
-\scriptsize
-\begin{tabular}{lrrrrrrr}
-\toprule
-\textbf{Architecture} & \textbf{top-1} & \textbf{est.} & \textbf{cal.\ (earlier)} & \textbf{cal.\ (untrained)}
-  & \textbf{mock (s)} & \textbf{prove (s)} & \textbf{verify (s)} \\
-\midrule
-mlp\_x2px\_none\_128x64x32 & 51.1\% & 19 & 18 & 19 & 19.1 & 57.5 & 0.20 \\
-mlp\_x2px\_layernorm\_128x64x32 & 52.0\% & 19 & 18 & 19 & 19.2 & 46.7 & 0.43 \\
-dws\_relu\_none\_16\_32\_64 & 62.9\% & 19 & 21 & 20 & 272.5 & 1339.9 & 4.74 \\
-dws\_relu\_none\_32\_64\_128 & 69.3\% & 21 & 22 & 21 & 256.4 & --- & --- \\
-dws\_relu\_none\_32\_64\_128\_256 & 75.0\% & 21 & 22 & 22 & 534.4 & --- & --- \\
-cnn\_relu\_none\_16\_32\_64 & 77.1\% & 22 & 22 & 22 & 949.5 & --- & --- \\
-cnn\_relu\_none\_16\_32\_64\_128 & 81.6\% & 22 & 22 & 22 & 1119.1 & --- & --- \\
-cnn\_relu\_none\_64\_128\_256 & 83.9\% & 26 & 25 & 26 & no result & --- & --- \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-The $75.0\%$ architecture (\texttt{dws\_relu\_none\_32$\times$64$\times$128$\times$256}) is estimated at
-$\logrows{=}21$ by the structural proxy and calibrated at $22$ by ezkl in both runs.  The
-estimate and the calibration disagree for several rows in this table, in both directions, and the
-two calibrations of the same architecture also differ for some rows, so the budget in
-Table~\ref{tab:search} should be read as a constraint-count budget on the estimate, not as a guarantee
-on ezkl logrows.
-
-\textbf{Deployment context.}  We did not measure on mobile hardware, so we make no
-claim about on-device feasibility.  The two small polynomial MLPs have
-the lowest measured prove times ($47$--$58$s) and the $\logrows{=}21$ DWS ReLU
-network took $1340$s, but these are different layer types and sizes, not a controlled activation comparison; a $\logrows{=}25$ circuit has $2^{25}$ rows and
-we recorded no proving result for it.
-
-\subsection{Budget-Constrained Architecture Search}
-
-\begin{table}[h]
-\centering
-\caption{Joint proxy vs.\ individual proxies and random selection in
-  budget-constrained search (top-20\% by proxy score).  Budgets are on the
-  structural-proxy estimate $\lceil\log_2 C\rceil$, not on ezkl-calibrated
-  logrows (the $75.0\%$ architecture is calibrated at $22$, Table~\ref{tab:ezkl}).
-  Entries are the best accuracy among selected architectures; the last column's
-  time is the single-run mock time.}
-\label{tab:search}
-\small
-\begin{tabular}{lrrrr}
-\toprule
-\textbf{Strategy}
-  & \textbf{est.\ $\logrows{\le}20$}
-  & \textbf{est.\ $\logrows{\le}21$}
-  & \textbf{est.\ $\logrows{\le}22$}
-  & \textbf{Proof time (${\le}22$ winner)} \\
-\midrule
-NEAR only              & $62.9\%$ & $75.0\%$ & $81.6\%$ & 1119s \\
-Synflow only           & $53.1\%$ & $61.0\%$ & $81.6\%$ & 1119s \\
-ZK cost only           & $52.0\%$ & $62.9\%$ & $62.9\%$ & 272s  \\
-\textbf{Joint proxy (ours)} & $\mathbf{62.9\%}$ & $\mathbf{75.0\%}$ & $\mathbf{75.0\%}$ & $\mathbf{534s}$ \\
-Random (avg)           & $55.5\%$ & $62.8\%$ & $73.5\%$ & ---   \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-With an estimated budget of $\logrows{\le}21$, the joint proxy selects the best
-architecture in the swept set within that estimated budget ($75.0\%$) while random
-selection falls $12.2$ points short ($62.8\%$ on average).  The estimated-budget
-winner calibrates to $\logrows{=}22$ in ezkl, so the budget should be read as a
-constraint-count budget ($C<2^{21}$), not a guarantee on ezkl logrows.  The joint proxy ties NEAR-only at the two tighter budgets, so its advantage over NEAR
-appears only at estimated $\logrows{\le}22$.  There it selects $75.0\%$ accuracy at $534$s
-mock time over NEAR's $81.6\%$ at $1119$s: roughly half the single-run mock time
-for $6.6$ accuracy points.  Whether that trade is appropriate depends on the
-deployment's time budget, which we did not measure.  The per-architecture sweep file behind this
-table ($n=335$ trained CIFAR-10 architectures) is not included in the released
-repository, so this table cannot be regenerated from the repository alone; the sweep
-generator is included, and the ezkl and proxy measurements in
-Tables~\ref{tab:ezkl} and~\ref{tab:proxyezkl} are.
-
-\subsection{Structural Proxy Validation}
-
-We compare the structural proxy's estimated $\logrows$ with ezkl's calibrated $\logrows$
-on $73$ architectures: a seeded stratified sample of the sweep's MLP and CNN families
-(ResNet-style models excluded to keep calibration tractable) plus the architectures
-of Table~\ref{tab:ezkl}; all $73$ calibrated without failure.  Networks have random untrained weights (seed $0$) and are calibrated with
-random Gaussian inputs, so this tests the cost model, not trained-network behaviour.
-The estimate equals ezkl's value exactly for $49$ of $73$ architectures ($67\%$) and is
-within one $\logrows$ for $66$ ($90\%$); errors run in both directions (range $-3$ to $+2$).
-Table~\ref{tab:proxyezkl} gives the breakdown.  Agreement is strong for ReLU, $x^2$ and
-$x^2{+}x$ networks and weak for $x^3{+}x$, where calibration frequently chooses a larger
-circuit than the row count implies (Section~\ref{sec:findings}).
-
-\begin{table}[h]
-\centering
-\caption{Structural-proxy $\logrows$ versus ezkl-calibrated $\logrows$ ($73$ architectures,
-  untrained weights).  Spearman $\rho$ with $95\%$ bootstrap CI (2000 resamples).}
-\label{tab:proxyezkl}
-\small
-\begin{tabular}{lrrrr}
-\toprule
-\textbf{Family} & $n$ & \textbf{exact} & \textbf{within 1} & \textbf{Spearman $\rho$ [95\% CI]} \\
-\midrule
-All          & 73 & 49 & 66 & $0.80$ $[0.65,0.91]$ \\
-ReLU         & 21 & 16 & 21 & $0.92$ $[0.76,0.98]$ \\
-$x^2$        & 16 & 12 & 16 & $0.94$ $[0.85,0.99]$ \\
-$x^2{+}x$    & 19 & 14 & 17 & $0.93$ $[0.82,0.98]$ \\
-$x^3{+}x$    & 17 &  7 & 12 & $0.28$ $[-0.41,0.75]$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Within the CIFAR-10 sweep the structural cost equals the sweep's constraint count by
-construction ($\rho=+1.000$ in every family), so that agreement is an identity and not
-evidence; Table~\ref{tab:proxyezkl} is the evidence for the model.  The proxy needs no ezkl run;
-we did not time it against calibration.
+\input{results_auto}
 
 
 % ============================================================
@@ -896,34 +447,36 @@ for two-party-computation private inference, where the cost model is
 communication and latency rather than ZK circuit size; and
 zkNAS~\citep{wang2026zknas} uses zero-knowledge proofs to let a server prove
 that an outsourced architecture search was run correctly, rather than searching for
-architectures that are cheap to prove.
+architectures that are cheap to prove.  Closest in measurement scope, Akor et
+al.~\citep{akor2026ezklcnn} profile eight CNN layer types (activations, pooling, normalization and linear
+layers) in ezkl at two precision settings over $26$ experiments, reporting proof time, proof size, circuit
+complexity and peak memory.  Our Section~\ref{sec:findings} is complementary rather than a replacement:
+it compares whole networks that differ only in activation, at matched width, and relates a graph-level
+cost model to ezkl's calibrated circuit size, and it feeds a NAS benchmark.  We have read their abstract
+but have not reproduced their measurements, so we make no claim about whether our ReLU-versus-$x^2$ result
+agrees with their layer-level activation measurements.
 
 \paragraph{MPC/FHE NAS.}
-CryptoNAS~\citep{ghodsi2020cryptonas} minimizes ReLU count for MPC (garbled
-circuits).  In MPC, linear layers are free via secret sharing; in ZK-SNARKs,
-they are not.  Across our $n{=}335$ sweep, the Spearman correlation between
-non-linear operation count (the CryptoNAS proxy) and ZK circuit constraints is
-$\rho=0.860$, but Kendall's $\tau=0.693$ --- meaning $16\%$ of architecture
-pairs are ranked in opposite order.  CryptoNAS results do not transfer to ZK
-deployment.  LinGCN (NeurIPS 2023) linearizes nonlinear layers for homomorphically encrypted
-inference, where multiplicative depth is the relevant cost; in our ZK setting the
-cost model depends on circuit size across all layers.
+CryptoNAS~\citep{ghodsi2020cryptonas} minimizes ReLU count for MPC (garbled circuits).  In MPC, linear layers are free via
+secret sharing; in ZK-SNARKs they are not.  In our fitted cost model multiply-accumulates cost about one assigned cell each
+while a ReLU element costs about 15.04 cells (Section~\ref{sec:results}), so at the widths we test the multiply-accumulate cells dominate and ReLU count would be a poor proxy for
+circuit size; we did not evaluate CryptoNAS itself.  LinGCN (NeurIPS 2023) linearizes nonlinear layers for homomorphically encrypted
+inference, where multiplicative depth is the relevant cost; in our ZK setting the cost model depends on circuit size across all layers.
 
 \paragraph{Training-free NAS proxies.}
 NEAR~\citep{husistein2025near}, AZ-NAS~\citep{lee2024aznas},
 ZiCo~\citep{li2023zico}, and MeCo~\citep{jiang2023meco} were developed and
 evaluated on standard ReLU-based NAS benchmarks (e.g.\ NAS-Bench-201 and NATS-Bench).
-In our benchmark NEAR collapses from $+0.828$ on ReLU to $-0.089$ on $x^2$
-architectures, and NASWOT is degenerate on $x^2$ networks (Proposition~\ref{prop:naswot}).
-To our knowledge this paper provides the first benchmark evidence of proxy failure in
-the ZK-ML design space.
+In our benchmark NEAR is $+0.70$ on ReLU networks but $-0.12$ on $x^2$ networks (Table~\ref{tab:corr}), and NASWOT is degenerate on $x^2$ networks (Proposition~\ref{prop:naswot}).
+We are not aware of earlier evaluations of these proxies on ZK-cost search spaces.
 
 \paragraph{NAS benchmarks.}
 NASBench-201~\citep{dong2020nasbench201} is the de facto standard, using
 ReLU+BatchNorm exclusively.  NATS-Bench~\citep{dong2021natsbench} likewise
 focuses on standard activations.  Neither includes polynomial activations,
-BN-free designs, or ZK cost as a metric.  to our knowledge zkml-bench is the first benchmark
-to cover these dimensions.
+BN-free designs, or ZK cost as a metric.  Layer-level ezkl measurements exist (see below), but we
+are not aware of an architecture-level NAS benchmark that records ZK circuit cost alongside accuracy
+for polynomial and BN-free networks.
 
 
 % ============================================================
@@ -931,86 +484,42 @@ to cover these dimensions.
 \label{sec:limitations}
 % ============================================================
 
-\paragraph{Scale.}
-We restrict the benchmark to CIFAR-scale inputs.  Our own extrapolation
-(not measured) is that a ResNet-50 on $224{\times}224$ ImageNet would need on the
-order of $\logrows{\approx}35$ ($2^{35}\approx 34$ billion rows), which we expect
-to be impractical to prove with current hardware; our largest measured circuit is
-$\logrows{=}22$, and the most accurate CNN in our sweep needs $\logrows{=}25$.
-Results here therefore do not transfer to ImageNet-scale models without new
-measurements.
+\paragraph{Scope.}
+All experiments use CIFAR-10 inputs, MLPs, CNNs and ResNet-style networks, one ezkl version (9.5.0), and one host.  The largest calibrated circuit has $\logrows{=}26$ and the largest proved circuit $\logrows{\le}21$.  We make no
+claim about transformers, ImageNet-scale inputs, other proving backends, or hardware other than the one used.  We expect a ResNet-50 on $224{\times}224$ ImageNet to need on the order of $\logrows{\approx}35$; this is an
+extrapolation, not a measurement.
 
-\paragraph{Training epochs.}
-We use 30-epoch accuracy as the ground truth.  The literature establishes that
-rank correlation with final accuracy plateaus by $\sim$$15$--$20$ epochs for
-NAS proxy evaluation~\citep{abdelfattah2021zerocost}.  Our 30-epoch budget is
-conservative.  In our targeted 26-architecture validation, independently
-trained 30- and 100-epoch architecture means have Spearman $\rho=0.932$
-($\rho=0.941$ across 77 paired seed runs; per-seed range $0.929$--$0.964$).
-This supports 30 epochs as a high-fidelity ranking signal, while the observed
-late learning in some deep polynomial CNNs cautions against treating the
-ranking as exact.
+\paragraph{Label quality and failures.}
+Accuracy is measured after 30 epochs with two seeds (median standard deviation 0.24 points; seed-pair Spearman 0.95).  The earlier three-seed, 100-epoch validation of 26 architectures
+(Section~\ref{sec:robust}) gives a 30-to-100-epoch Spearman of $0.932$, supporting 30 epochs as a ranking signal, but late learning in some deep polynomial CNNs means the ordering is not exact.
+153 networks, mostly polynomial, end at chance level; polynomial networks with normalization used the larger learning rate and fail often, so accuracy labels for polynomial networks partly measure trainability under this recipe.
+We report results with and without the failed networks and with a common recipe, but a different recipe could change the polynomial results.
 
-\paragraph{Single seed.}
-The broad CIFAR-10 ($n=335$) and CIFAR-100 ($n=84$) benchmark sweeps retain
-one seed per architecture.  We therefore do not claim that every per-family
-proxy coefficient is free of seed noise.  The targeted suite covers 26
-architectures with three seeds, including all eight central accuracy/proving
-claims: their largest 30-epoch sample standard deviation is $1.61$ percentage
-points, and the selected architecture reproduces at
-$74.73\%\mathbin{\pm}1.61\%$.  Extending multi-seed coverage to the full
-benchmark remains future work.
+\paragraph{Calibration on trained networks, and pools.}
+Circuit-size results use trained seed-0 weights and $20$ real test images for calibration.  ezkl's calibration depends on the network and the calibration data, and we did not study its sensitivity to the number or choice of calibration images.
+Networks that failed to train, networks with estimated $\logrows>25$, and calibrations that failed inside ezkl are not in the search pools.  Search results therefore describe a pool of trainable, calibratable networks (ReLU networks are 28--33\% of each pool), and they do not penalize methods for selecting networks that would fail.
 
-\paragraph{Practical takeaways for ZK-ML practitioners.}
-These are suggestions from our measurements, not tested prescriptions.
-(1) Do not assume polynomial activations are cheaper to prove: width-matched, ReLU and
-$x^2$ had the same $\logrows$ (Table~\ref{tab:matched}), and unnormalized $x^3{+}x$ networks calibrated to a larger circuit.
-The small polynomial MLPs in Table~\ref{tab:ezkl} were cheap because they are small MLPs, and
-they have $51$--$52\%$ accuracy against $77$--$84\%$ for the CNNs.
-(2) Measure rather than assume: the cost model's estimate differed from ezkl's
-calibrated $\logrows$ for $24$ of $73$ architectures (Table~\ref{tab:proxyezkl}).
-(3) NEAR, ZenNAS and NASWOT were unreliable on our polynomial architectures; we
-did not find a proxy that works across all families.
+\paragraph{Timings.}
+Real-proof timings cover a few architectures, were run on a host shared with other jobs, and use one repeat at larger sizes (Table~\ref{tab:ezkl}).  They are indicative; circuit size ($\logrows$, assigned cells) is the measure we rely on.
+
+\paragraph{Reproducibility.}
+Per-architecture results for both seeds, calibration records with fitting features, and the scripts that generate every table are released.  Trained weights and the raw output of the earlier three-seed job are not.
+
+\paragraph{What we do not claim.}
+We do not claim that polynomial activations are cheaper to prove, that the joint accuracy-cost proxy improves search, that the cost model is exact, or that any tested proxy predicts accuracy across activation families.
 
 
-% ============================================================
 \section{Conclusion}
 \label{sec:conclusion}
 % ============================================================
 
-We showed that deploying neural networks in ZK proof systems creates a
-fundamentally different NAS landscape.  The core insight: a ZK circuit cost model is
-hardware-independent and available before any training, which makes it a
-useful basis for architecture search, with the caveat that the model matches
-ezkl-calibrated $\logrows$ exactly for $67\%$ of architectures checked and within one for $90\%$.
+We evaluated ZK circuit cost and zero-cost accuracy proxies against ezkl on trained CIFAR-10 networks.  A parametric cell-count model fitted on 187 networks matches ezkl-calibrated $\logrows$ exactly for 43 of 56
+held-out networks and within one for 53, with weak agreement for $x^3{+}x$.  Width-matched, ReLU and $x^2$ networks have the same circuit size, which contradicts the common assumption that polynomial activations
+are cheaper to prove in ezkl; the largest cost differences we found come from layer type, width and ezkl's range calibration.  NEAR predicts accuracy for ReLU networks only, ZenNAS and a NASWOT variant are anti-correlated on polynomial networks, and
+under budgets set on calibrated circuit size a joint accuracy-cost proxy does not improve on NEAR-only.  The cost model is most useful as a pre-filter: it removes most, not all, budget violations without running ezkl.
 
-Several standard zero-cost proxies were unreliable on the polynomial-activation
-architectures we built: NEAR collapses from $\rho{=}{+}0.83$ on our ReLU architectures
-to $\rho{=}-0.09$ on $x^2$ architectures; ZenNAS is anti-correlated in all
-polynomial families (with a mechanistic explanation in
-Proposition~\ref{prop:zen}); NASWOT as implemented returns $-\infty$ on all $272$ polynomial CIFAR-10 networks because it finds no
-ReLU modules (Proposition~\ref{prop:naswot} proves degeneracy for $x^2$ only), and ZiCo is the one proxy
-that partly worked ($\rho=+0.54$ on $x^3{+}x$, but $-0.04$ on $x^2{+}x$).
-
-Our width-matched ezkl measurements give a negative result for the common assumption
-that polynomial activations are cheaper to prove: ReLU and $x^2$ networks have the same
-calibrated $\logrows$ at identical widths, and $x^3{+}x$ networks calibrate to a larger
-circuit.  In our measurements the selected DWS+ReLU architecture has a mock-proof time of
-$534$s versus $1119$s for the largest feasible CNN ($75.0\%$ vs.\ $81.6\%$ accuracy), and
-avoids the $\logrows{=}25$ circuit of the most accurate CNN, for which we recorded no result.
-
-\paragraph{Limitations of the new measurements.}
-The proxy-versus-ezkl and width-matched experiments use untrained random weights, random
-Gaussian calibration inputs, one ezkl version (9.5.0), one seed and single runs, and they
-cover MLPs and small CNNs only; calibration is known to depend on weights and data
-(Section~\ref{sec:findings}).  They do not cover transformers, residual networks, or trained
-networks, and they measure circuit size, not proving time.
-
-The zkml-bench code, the sweep generator, the ezkl measurement scripts, the result
-files behind Tables~\ref{tab:ezkl} and~\ref{tab:proxyezkl}, and the multi-seed validation
-summary are at \texttt{https://github.com/npow/zk-circuit-aware-nas} (tag
-\texttt{v1}).  The per-architecture sweep results behind the correlation and
-budget-search tables, and the raw multi-seed job output, are not in that repository.
+The zkml-bench code, per-architecture results for both seeds, calibration records, and the scripts that regenerate every table are at
+\texttt{https://github.com/npow/zk-circuit-aware-nas} (tag \texttt{v2}).  Trained weights and the raw output of the earlier three-seed job are not released.
 
 
 % ============================================================
@@ -1027,6 +536,14 @@ Dong, X. and Yang, Y.
 \newblock {NAS-Bench-201}: Extending the scope of reproducible neural
   architecture search.
 \newblock In \emph{International Conference on Learning Representations}, 2020.
+
+\bibitem[Akor et al.(2026)]{akor2026ezklcnn}
+Akor, G.~C., Ahakonye, L.~A.~C., Lee, J.-M., and Kim, D.-S.
+\newblock Benchmarking {CNN} components in {EZKL}: A layer-level analysis for
+  {EVM}-compatible deployment.
+\newblock In \emph{International Conference on Artificial Intelligence in
+  Information and Communication (ICAIIC)}, pages 645--650, 2026.
+  doi:10.1109/ICAIIC68212.2026.11454315.
 
 \bibitem[Dong et al.(2021)]{dong2021natsbench}
 Dong, X., Liu, L., Musial, K., and Gabrys, B.

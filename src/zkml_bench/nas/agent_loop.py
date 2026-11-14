@@ -315,8 +315,8 @@ def run_nas(
     candidates_dir = out_path / "candidates"
     candidates_dir.mkdir(exist_ok=True)
 
-    # Support Netflix internal proxy (ANTHROPIC_BASE_URL set but no ANTHROPIC_API_KEY)
-    # Also support Netflix model gateway (MGP) via ANTHROPIC_BASE_URL + dummy key
+    # Support a custom API proxy (ANTHROPIC_BASE_URL set but no ANTHROPIC_API_KEY)
+    # Also support a model gateway via ANTHROPIC_BASE_URL + dummy key
     base_url = os.environ.get("ANTHROPIC_BASE_URL")
     effective_key = api_key or os.environ.get("ANTHROPIC_API_KEY") or (
         "sk-dummy" if base_url else None

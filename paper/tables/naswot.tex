@@ -1,0 +1,17 @@
+\begin{table}[h]
+\centering
+\caption{Networks with a $-\infty$ NASWOT score: standard implementation (scores \texttt{nn.ReLU} outputs) versus the
+  pre-activation-sign variant.}
+\label{tab:naswot}
+\small
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Family} & $n$ & \textbf{standard $-\infty$} & \textbf{sign variant $-\infty$} \\
+\midrule
+ReLU & 111 & 0 & 0 \\
+$x^2$ & 121 & 121 & 0 \\
+$x^3{+}x$ & 121 & 121 & 0 \\
+$x^2{+}x$ & 121 & 121 & 0 \\
+\bottomrule
+\end{tabular}
+\end{table}

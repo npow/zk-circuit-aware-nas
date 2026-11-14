@@ -1,0 +1,18 @@
+\begin{table}[h]
+\centering
+\caption{Width-matched ezkl circuit size on \emph{trained} seed-0 networks calibrated with real CIFAR-10 inputs: assigned cells (calibrated $\logrows$).
+  ``fail'': calibration did not complete or errored (recorded in the released file).}
+\label{tab:matchedtrained}
+\small
+\begin{tabular}{lrrrr}
+\toprule
+\textbf{Skeleton} & \textbf{ReLU} & $\mathbf{x^2}$ & $\mathbf{x^2{+}x}$ & $\mathbf{x^3{+}x}$ \\
+\midrule
+MLP 128-64-32 & 0.404M (19) & 0.407M (19) & 0.408M (19) & 0.402M (23) \\
+MLP 256-128 & 0.823M (20) & 0.824M (20) & 0.824M (20) & 0.813M (23) \\
+MLP 512-256 & 1.703M (21) & 1.710M (21) & 1.711M (21) & 1.688M (23) \\
+CNN 16-32 & 1.732M (21) & 1.832M (21) & 1.855M (21) & 1.879M (23) \\
+CNN 16-32-64 & 2.795M (22) & 2.909M (22) & 2.938M (22) & 2.956M (23) \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,0 +1,21 @@
+\begin{table}[h]
+\centering
+\caption{Partial Spearman correlation of proxy and accuracy after removing, by rank regression, the effects of
+  architecture type (MLP, CNN, DWS-CNN, ResNet-style), normalization and $\log$ parameter count.  ${}^{*}$: unadjusted
+  $p<0.05$ for the partial correlation (descriptive only; the Holm-adjusted tests are in Table~\ref{tab:corr}).}
+\label{tab:partial}
+\small
+\begin{tabular}{lrrrr}
+\toprule
+\textbf{Proxy} & \textbf{ReLU} & $\bm{x^2}$ & $\bm{x^3{+}x}$ & $\bm{x^2{+}x}$ \\
+\midrule
+NEAR & $+0.22^{*}$ & $+0.05$ & $+0.03$ & $-0.01$ \\
+Synflow & $+0.40^{*}$ & $-0.37^{*}$ & $-0.19$ & $-0.31^{*}$ \\
+ZiCo & $+0.13$ & $-0.06$ & $+0.48^{*}$ & $+0.01$ \\
+MeCo & $+0.23^{*}$ & $-0.05$ & $-0.01$ & $-0.01$ \\
+ZenNAS & $+0.02$ & $-0.32^{*}$ & $-0.12$ & $-0.36^{*}$ \\
+NASWOT (ReLU patterns) & $+0.00$ & -- & -- & -- \\
+NASWOT (pre-activation signs) & $-0.00$ & $-0.07$ & $-0.06$ & $-0.20^{*}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
