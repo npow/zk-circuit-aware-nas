@@ -514,7 +514,7 @@ We do not claim that polynomial activations are cheaper to prove, that the joint
 \label{sec:conclusion}
 % ============================================================
 
-We evaluated ZK circuit cost and zero-cost accuracy proxies against ezkl on trained CIFAR-10 networks.  A parametric cell-count model fitted on 187 networks matches ezkl-calibrated $\logrows$ exactly for 39 of 54
+We evaluated ZK circuit cost and zero-cost accuracy proxies against ezkl on trained CIFAR-10 networks.  A parametric cell-count model fitted on 180 networks matches ezkl-calibrated $\logrows$ exactly for 39 of 54
 held-out networks and within one for 51, with weak agreement for $x^3{+}x$.  Width-matched, ReLU and $x^2$ networks have the same circuit size, which contradicts the common assumption that polynomial activations
 are cheaper to prove in ezkl; the largest cost differences we found come from layer type, width and ezkl's range calibration.  NEAR predicts accuracy for ReLU networks only, ZenNAS and a NASWOT variant are anti-correlated on polynomial networks, and
 under budgets set on calibrated circuit size a joint accuracy-cost proxy does not improve on NEAR-only.  The cost model is most useful as a pre-filter: it removes most, not all, budget violations without running ezkl.
