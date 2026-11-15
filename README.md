@@ -13,7 +13,7 @@ training seeds, and a study of zero-cost proxies on it. Everything is measured w
 |---|---|---|
 | Sweep (accuracy, 2 seeds; proxies and cost estimate at seed-0 init) | `sweep_gpu.py` | `results/sweep/*.jsonl` |
 | ezkl calibration of trained seed-0 networks with real CIFAR-10 inputs, with ONNX-op features | `calibrate_trained.py` | `results/trained_calibration.jsonl`, `results/trained_calibration_skipped.json` |
-| ezkl timings (repeated) and quantized accuracy on trained networks | `time_ezkl.py` | `results/ezkl_timing_trained.jsonl` (used in the paper); `results/ezkl_timing_trained_run2_partial.jsonl` is an incomplete second run (3 repeats at logrows 20-21; stopped before the logrows-22 circuits) and is not used |
+| ezkl timings (repeated) and quantized accuracy on trained networks | `time_ezkl.py` | `results/ezkl_timing_trained.jsonl` (used in the paper: 3 repeats up to logrows 21, 1 real proof at logrows 22); `results/ezkl_timing_trained_run1.jsonl` is an earlier run with fewer repeats and is not used |
 | Full ezkl `settings.json` for 72 stratified trained networks (logrows accounting rule) | `calibrate_trained.py` with `DUMP_SETTINGS_DIR` | `results/settings_dump/` |
 | 3-seed, 30- vs 100-epoch validation of 26 architectures | `sweep_gpu.py --seed {42,43,44} --epochs {30,100} --only ... --no-proxies` | `results/multiseed/`, `results/multiseed_summary.json` (`analyze_multiseed.py`) |
 | Width-matched activation comparison, untrained (3 seeds) | `matched_width_activation_cost.py` | `results/matched_width_activation*.json` |

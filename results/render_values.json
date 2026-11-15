@@ -608,15 +608,15 @@
 "timing_cpu": "AMD Ryzen Threadripper PRO 3945WX 12-Cores",
 "timing_ezkl": "9.5.0",
 "t_n": "7",
-"t_n_prove": "4",
-"t_prove_min": "25",
-"t_prove_max": "350",
+"t_n_prove": "7",
+"t_prove_min": "28",
+"t_prove_max": "970",
 "t_mock_min": "2",
-"t_mock_max": "42",
+"t_mock_max": "49",
 "t_logrows_min": "19",
 "t_logrows_max": "22",
-"t_mock_spread": "19",
+"t_mock_spread": "14",
 "t_q_total": "700",
 "t_q_agree": "700",
-"t_prove_logrows_max": "21"
+"t_prove_logrows_max": "22"
 }

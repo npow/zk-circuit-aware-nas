@@ -367,7 +367,7 @@ try:
 \centering
 \caption{ezkl timings on trained seed-0 networks with real CIFAR-10 inputs under one recorded configuration
   (ezkl """ + host["ezkl"] + r""", """ + host["cpu"].replace("&", r"\&") + r""", """ + str(host["logical_cores"]) + r""" logical cores, shared host).  Median [min,max] over
-  repeats; seconds.  Mock proofs: $\times3$.  Real proofs: $\times3$ for $\logrows<20$, $\times1$ for $\logrows\in\{20,21\}$, not run for $\logrows\ge22$.  Last column: quantized-circuit predictions that agree with the float model on real test images.}
+  repeats; seconds.  Mock proofs: $\times3$.  Real proofs: $\times3$ for $\logrows\le21$, $\times1$ for $\logrows=22$.  Last column: quantized-circuit predictions that agree with the float model on real test images.}
 \label{tab:ezkl}
 \scriptsize
 \begin{tabular}{lrrrrrrr}

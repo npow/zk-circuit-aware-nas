@@ -102,8 +102,8 @@ ratio of assigned cells ($x^2$/ReLU) is 1.03.
 17/40 of the $x^3{+}x$ networks.  The identity is therefore not exact for trained networks with normalization or residual structure, where calibration sometimes enlarges the circuit.
 
 \textbf{Timings.}  Table~\ref{tab:ezkl} replaces the timings of the earlier version, whose ezkl version, settings, weight state and hardware were not recorded.  It covers 7 trained seed-0 networks at $\logrows$ 19--22
-with real inputs, one ezkl version and one host.  Mock proofs were repeated three times (spread at most 19\% of the median) and take 2--42\,s.
-Real proofs were run for the 4 networks up to $\logrows{=}21$, three times when $\logrows<20$ and once otherwise, and take 25--350\,s; larger circuits were mock-proved only.
+with real inputs, one ezkl version and one host.  Mock proofs were repeated three times (spread at most 14\% of the median) and take 2--49\,s.
+Real proofs were run for all 7 networks, three times for $\logrows\le21$ and once for $\logrows=22$, and take 28--970\,s.
 The proving times in the earlier version (up to $1340$\,s for a $\logrows{=}21$ network) are \emph{not} reproduced: the comparable network here proves in a fraction of that time, and we withdraw the earlier timings.
 The quantized circuits agree with the float models on 700 of 700 real test-image predictions.  The host is shared with other jobs, so times are indicative; the load average before and after each run is in the released file.
 

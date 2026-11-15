@@ -103,7 +103,7 @@ ratio of assigned cells ($x^2$/ReLU) is @@pairs_ratio_med@@.
 
 \textbf{Timings.}  Table~\ref{tab:ezkl} replaces the timings of the earlier version, whose ezkl version, settings, weight state and hardware were not recorded.  It covers @@t_n@@ trained seed-0 networks at $\logrows$ @@t_logrows_min@@--@@t_logrows_max@@
 with real inputs, one ezkl version and one host.  Mock proofs were repeated three times (spread at most @@t_mock_spread@@\% of the median) and take @@t_mock_min@@--@@t_mock_max@@\,s.
-Real proofs were run for the @@t_n_prove@@ networks up to $\logrows{=}@@t_prove_logrows_max@@$, three times when $\logrows<20$ and once otherwise, and take @@t_prove_min@@--@@t_prove_max@@\,s; larger circuits were mock-proved only.
+Real proofs were run for all @@t_n_prove@@ networks, three times for $\logrows\le21$ and once for $\logrows=22$, and take @@t_prove_min@@--@@t_prove_max@@\,s.
 The proving times in the earlier version (up to $1340$\,s for a $\logrows{=}21$ network) are \emph{not} reproduced: the comparable network here proves in a fraction of that time, and we withdraw the earlier timings.
 The quantized circuits agree with the float models on @@t_q_agree@@ of @@t_q_total@@ real test-image predictions.  The host is shared with other jobs, so times are indicative; the load average before and after each run is in the released file.
 

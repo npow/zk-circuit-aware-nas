@@ -68,7 +68,7 @@ that polynomial activations are cheaper to prove in ezkl; unnormalized $x^3{+}x$
 ZiCo's apparent success on $x^3{+}x$ disappears once failed training runs are removed.  Between 39\% and 60\% of polynomial networks fail to train.
 \textbf{(4) Search.}  With budgets set on ezkl-calibrated circuit size, a tuned joint accuracy-cost proxy is indistinguishable from NEAR-only, which beats random selection; we
 withdraw an earlier claim of a joint-proxy gain.  Filtering by the cost model's estimate removes most but not all budget violations.
-Scope: CIFAR-10, one ezkl version, calibration on trained networks with real inputs, real proofs for a few architectures.
+Scope: CIFAR-10, one ezkl version, calibration on trained networks with real inputs, real proofs for seven architectures.
 \end{abstract}
 
 % ============================================================
@@ -81,11 +81,10 @@ ZK-ML systems (ezkl, Orion, RISC Zero) let anyone prove neural network
 inference was correct --- without revealing inputs.  This enables private
 biometric verification (e.g., Worldcoin), on-chain AI oracles, and
 compliant ML auditing.  But proving is slow, and its cost depends on architectural choices that are hard to predict: in our measurements real
-proving time ranges from $25$\,s to $350$\,s over the 4 trained networks we proved (Table~
-ef{tab:ezkl}).
+proving time ranges from $28$\,s to $970$\,s over the 7 trained networks we proved (Table~\ref{tab:ezkl}).
 
 \paragraph{What we show empirically.}
-Real proving time varies by more than an order of magnitude across the 4 trained networks we proved (Table~\ref{tab:ezkl}).  A width-matched comparison
+Real proving time varies by more than an order of magnitude (28\,s to 970\,s) across the 7 trained networks we proved (Table~\ref{tab:ezkl}).  A width-matched comparison
 (Tables~\ref{tab:matched} and~\ref{tab:matchedtrained}) shows that this spread does not come from the ReLU-versus-$x^2$ choice: at identical widths the two have the same calibrated $\logrows$
 (in all five skeletons, and in 45 of 50 matched pairs across the trained sweep).  Differences come from layer type, width, and from ezkl's range calibration, which raises $\logrows$ for unnormalized
 $x^3{+}x$ networks.  We therefore report a negative result for the assumption that polynomial activations are cheaper to prove in ezkl.  We also report that the zero-cost proxies we tested do not
@@ -501,7 +500,7 @@ Circuit-size results use trained seed-0 weights and $20$ real test images for ca
 Networks that failed to train, networks with estimated $\logrows>25$, and calibrations that failed inside ezkl are not in the search pools.  Search results therefore describe a pool of trainable, calibratable networks (ReLU networks are 28--33\% of each pool), and they do not penalize methods for selecting networks that would fail.
 
 \paragraph{Timings.}
-Real-proof timings cover a few architectures, were run on a host shared with other jobs, and use one repeat at larger sizes (Table~\ref{tab:ezkl}).  They are indicative; circuit size ($\logrows$, assigned cells) is the measure we rely on.
+Real-proof timings cover seven architectures, were run on a host shared with other jobs, and use one real proof at logrows 22 (Table~\ref{tab:ezkl}).  They are indicative; circuit size ($\logrows$, assigned cells) is the measure we rely on.
 
 \paragraph{Reproducibility.}
 Per-architecture results for both seeds, calibration records with fitting features, and the scripts that generate every table are released.  Trained weights (about 0.7 GB) are not.
