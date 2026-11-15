@@ -106,6 +106,9 @@ put("relu_share_min", f"{100*min(sh):.0f}"); put("relu_share_max", f"{100*max(sh
 for B_ in (20, 21, 22, 23):
     nb = D[f"B<={B_}"]["near_top_K_by_act"]
     put(f"neartop{B_}_poly", sum(v for k, v in nb.items() if k != "relu"))
+_pv = [x for Dx in (D, D5) for b in (20, 21, 22, 23) for l, x in Dx[f"B<={b}"]["paired_vs_lambda0"].items() if l in ("0.25", "0.5")]
+put("pv_better_max", f"{100*max(x['better_frac'] for x in _pv):.0f}"); put("pv_worse_max", f"{100*max(x['worse_frac'] for x in _pv):.0f}")
+put("pv_ci_excl0", sum(1 for x in _pv if x["ci95"][0] > 0 or x["ci95"][1] < 0)); put("pv_cells", len(_pv))
 tot_lam0 = sum(D[f"B<={b}"]["chosen_lambda_counts"].get("0.0", 0) for b in (20, 21, 22, 23)); tot = 4 * D["splits"]
 put("lam0_pct", f"{100*tot_lam0/tot:.0f}")
 for B_ in (20, 21, 22, 23):
@@ -138,6 +141,7 @@ for a in ("relu", "x2", "x2px", "x3px"):
 
 # ----- calibration rule bookkeeping, CV, evaluation split -----
 cr = S["calibration_rule"]
+put("calib_max_logrows", cr["max_logrows_used"]); put("pool_failed_b23", D["B<=23"]["pool_failed_any_seed_or_mean_lt15"])
 put("calib_records", cr["records"]); put("calib_dropped", cr["dropped_by_uniform_rule"]); put("calib_used", cr["used"]); put("calib_failed_used", cr["failed_inside_ezkl"])
 cv = E.get("cross_validation")
 if cv:

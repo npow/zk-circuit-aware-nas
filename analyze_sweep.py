@@ -274,7 +274,7 @@ def section_D(arch, calib, K=10, splits=300, lams=(0.0, 0.25, 0.5, 1.0, 2.0, 4.0
     rng = random.Random(seed)
     for B in (20, 21, 22, 23):
         pool_all = [b for b in base if b["logrows"] <= B]
-        ent = {"pool": len(pool_all), "pool_by_act": dict(collections.Counter(b["act"] for b in pool_all)),
+        ent = {"pool": len(pool_all), "pool_failed_any_seed_or_mean_lt15": sum(is_failed(arch[b["name"]]) for b in pool_all), "pool_by_act": dict(collections.Counter(b["act"] for b in pool_all)),
                "near_top_K_by_act": dict(collections.Counter(pool_all[i]["act"] for i in select(pool_all, "near", 0, K, rng)))}
         if len(pool_all) < 24:
             ent["note"] = "pool too small for a 50/50 tuning/evaluation split"
@@ -311,6 +311,11 @@ def section_D(arch, calib, K=10, splits=300, lams=(0.0, 0.25, 0.5, 1.0, 2.0, 4.0
         ent["joint_vs_random"] = {"win": int((j < rd - 1e-9).sum()), "tie": int((abs(j - rd) <= 1e-9).sum()), "loss": int((j > rd + 1e-9).sum())}
         ent["chosen_lambda_counts"] = dict(collections.Counter(chosen_lams))
         ent["regret_by_lambda_untuned"] = {str(l): float(np.mean(v)) for l, v in reg_by_lam.items()}
+        base0 = np.array(reg_by_lam[lams[0]])
+        ent["paired_vs_lambda0"] = {str(l): {"mean": float(np.mean(np.array(reg_by_lam[l]) - base0)),
+                                              "ci95": [float(np.percentile(np.array(reg_by_lam[l]) - base0, 2.5)), float(np.percentile(np.array(reg_by_lam[l]) - base0, 97.5))],
+                                              "better_frac": float((np.array(reg_by_lam[l]) < base0 - 1e-9).mean()), "worse_frac": float((np.array(reg_by_lam[l]) > base0 + 1e-9).mean())}
+                                    for l in lams[1:]}
         ent["tie_rule"] = "ties broken toward smaller lambda; lambda=0 is NEAR-only"
         out[f"B<={B}"] = ent
     out["K"] = K; out["splits"] = splits; out["lambda_grid"] = list(lams)
@@ -515,7 +520,8 @@ def main():
         calib, dropped = apply_skip_rule(arch, calib_all)
         out["calibration_rule"] = {"records": len(calib_all), "dropped_by_uniform_rule": len(dropped), "used": len(calib),
                                    "failed_inside_ezkl": sum(1 for c in calib if c.get("logrows") is None),
-                                   "pool_members_failed_or_est_gt_25": 0}
+                                   "pool_members_failed_or_est_gt_25": 0,
+                                   "max_logrows_used": max((c["logrows"] for c in calib if c.get("logrows")), default=None)}
         json.dump(sorted(c["name"] for c in dropped), open("results/calibration_dropped_by_rule.json", "w"), indent=1)
         out["D_search"] = section_D(arch, calib)
         out["D_search_K5"] = section_D(arch, calib, K=5)

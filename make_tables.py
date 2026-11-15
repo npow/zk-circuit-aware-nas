@@ -213,37 +213,36 @@ if D:
 \end{table}
 """)
 
-# ---------------- untuned regret per lambda ----------------
+# ---------------- untuned regret per lambda (paired differences) ----------------
 if D:
     lams = D["lambda_grid"]
-    rows = []
-    for B_ in (20, 21, 22, 23):
-        e = D.get(f"B<={B_}", {})
-        if "regret_by_lambda_untuned" not in e:
-            continue
-        r_ = e["regret_by_lambda_untuned"]
-        cells = " & ".join(f"{r_[str(l)]:.2f}" for l in lams)
-        rows.append(rf"$\le{B_}$ & {e['pool']} & {cells} & {e['joint']['mean_regret']:.2f} \\")
     D5_ = S.get("D_search_K5")
-    rows5 = []
-    for B_ in (20, 21, 22, 23):
-        e = D5_.get(f"B<={B_}", {}) if D5_ else {}
-        if "regret_by_lambda_untuned" in e:
-            r_ = e["regret_by_lambda_untuned"]
-            rows5.append(rf"$\le{B_}$ & {e['pool']} & " + " & ".join(f"{r_[str(l)]:.2f}" for l in lams) + rf" & {e['joint']['mean_regret']:.2f} \\")
+    def block(Dx):
+        rows = []
+        for B_ in (20, 21, 22, 23):
+            e = Dx.get(f"B<={B_}", {})
+            if "paired_vs_lambda0" not in e:
+                continue
+            pv = e["paired_vs_lambda0"]
+            cells = []
+            for l in lams[1:]:
+                x = pv[str(l)]
+                cells.append(rf"{x['mean']:+.2f} {{\scriptsize[{x['ci95'][0]:+.2f},{x['ci95'][1]:+.2f}]}} {{\scriptsize({100*x['better_frac']:.0f}/{100*x['worse_frac']:.0f})}}")
+            rows.append(rf"$\le{B_}$ & {e['pool']} & {e['regret_by_lambda_untuned']['0.0']:.2f} & " + " & ".join(cells) + r" \\")
+        return rows
     OUT.append(r"""\begin{table}[h]
 \centering
-\caption{Untuned test of the joint proxy: mean regret (accuracy points) on the evaluation halves for each \emph{fixed} $\lambda$ (columns), averaged over """ + str(D["splits"]) + r""" splits;
-  $\lambda=0$ is NEAR-only.  The last column is the tuned joint proxy, whose tuning breaks ties toward the smaller $\lambda$.  Upper block $K=""" + str(D["K"]) + r"""$, lower block $K=""" + str(D5_["K"]) + r"""$.}
+\caption{Untuned test of the joint proxy.  For each \emph{fixed} $\lambda>0$, the per-split paired difference in regret (accuracy points) relative to $\lambda=0$ (NEAR-only) on the evaluation halves: mean, $2.5$--$97.5$ percentile range over """ + str(D["splits"]) + r""" splits, and in parentheses the percentage of splits in which
+  it is better / worse (negative difference = better than NEAR-only).  The third column is NEAR-only's mean regret.  Upper block $K=""" + str(D["K"]) + r"""$, lower block $K=""" + str(D5_["K"]) + r"""$.}
 \label{tab:lambda}
-\small
-\begin{tabular}{rr""" + "r" * len(lams) + r"""r}
+\scriptsize
+\begin{tabular}{rrr""" + "r" * (len(lams) - 1) + r"""}
 \toprule
-$B$ & pool & """ + " & ".join(rf"$\lambda{{=}}{l:g}$" for l in lams) + r""" & tuned \\
+$B$ & pool & $\lambda{=}0$ & """ + " & ".join(rf"$\lambda{{=}}{l:g}$" for l in lams[1:]) + r""" \\
 \midrule
-""" + "\n".join(rows) + r"""
+""" + "\n".join(block(D)) + r"""
 \midrule
-""" + "\n".join(rows5) + r"""
+""" + "\n".join(block(D5_)) + r"""
 \bottomrule
 \end{tabular}
 \end{table}

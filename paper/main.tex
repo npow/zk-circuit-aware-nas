@@ -28,6 +28,7 @@
 \newtheorem{corollary}[theorem]{Corollary}
 \newtheorem{definition}{Definition}
 \newtheorem{remark}{Remark}
+\newtheorem{assumption}{Assumption}
 
 %% --- Math macros ---
 \newcommand{\calA}{\mathcal{A}}
@@ -62,7 +63,7 @@ and evaluated on 54 held-out ones, matches ezkl-calibrated $\logrows$ exactly fo
 (Spearman 0.84; cross-validated over all 234 networks: 70\% exact, 95\% within one).  The mismatches have a mechanism: on 72 dumped ezkl settings, $\logrows$
 is exactly the maximum of four resource requirements (rows, constants, lookup table, range-check table; 72 of 72 sampled networks at $\logrows$ 19--23), of which cell count is one.
 \textbf{(2) A negative result.}  Width-matched, ReLU and $x^2$ networks have the same calibrated $\logrows$ (all 5 skeletons; 45 of 50 matched pairs in the sweep), contradicting the assumption
-that polynomial activations are cheaper to prove in ezkl; unnormalized $x^3{+}x$ networks calibrate to a circuit up to $16\times$ larger at equal cell count because their range-check table has $2^{22}$ entries.
+that polynomial activations are cheaper to prove in ezkl; unnormalized $x^3{+}x$ networks calibrate to a circuit up to $16\times$ larger at equal cell count because their range-check table spans $2^{22}+1$ values.
 \textbf{(3) Benchmark.}  We release zkml-bench, 474 networks with two training seeds and proxy scores.  NEAR predicts accuracy only for ReLU networks
 ($\rho=+0.70$) and is indistinguishable from zero on all three polynomial families; ZenNAS is anti-correlated on polynomial networks; a sign-pattern NASWOT variant is negatively correlated on polynomial networks;
 ZiCo's apparent success on $x^3{+}x$ disappears once failed training runs are removed.  Between 39\% and 60\% of polynomial networks fail to train.
@@ -157,7 +158,7 @@ We do not evaluate CryptoNAS itself.
 % ============================================================
 
 This section states what we can and cannot establish about ezkl circuit size.  The
-claims are deliberately modest: Proposition~\ref{prop:cost} is a structural statement and
+claims are deliberately modest: Assumption~\ref{prop:cost} is a structural statement and
 a parametric form; its quantitative content is tested empirically in
 Sections~\ref{sec:findings} and~\ref{sec:results}, not proved.
 
@@ -167,7 +168,7 @@ ezkl compiles an ONNX graph $G$ into a PLONKish circuit.  Fix the quantization s
 the lookup range $R$ (both are chosen by ezkl's calibration pass).  Each node $v$ has an operator
 type $o(v)$, input and output tensor shapes, and attributes (kernel size, stride, padding, groups).
 
-\begin{proposition}[Structure of the cost model]
+\begin{assumption}[Structure of the cost model]
 \label{prop:cost}
 For fixed $(s,R)$ the circuit layout (columns, selectors, lookup and permutation structure) is a
 function of the graph structure $(o(v),\text{shapes},\text{attributes})_{v\in G}$ only and does not
@@ -185,19 +186,20 @@ where $\mathcal{M}$ is the set of Gemm, MatMul and Conv nodes, with
 $\mathrm{MAC}=n_{\mathrm{in}}n_{\mathrm{out}}$ for a Gemm node and
 $\mathrm{MAC}=h'w'\,c_{\mathrm{out}}\,(c_{\mathrm{in}}/g)\,k_hk_w$ for a Conv node with output
 spatial size $h'\times w'$ and $g$ groups; $\mathrm{el}(v)$ is the number of output elements;
-$\beta_o,\gamma,\alpha_o\ge 0$ are coefficients; and $\varepsilon$ is an unmodelled residual.  ezkl reports
-$C/2$ rows, and the calibrated $\logrows$ is the largest of four requirements (rows, constants, lookup table, range-check table; Section~\ref{sec:results}), so
-$\logrows=\lceil\log_2 C\rceil$ holds only when some other requirement binds exactly one level above the rows requirement $\lceil\log_2 C\rceil-1$.
-\end{proposition}
+$\beta_o,\gamma,\alpha_o\ge 0$ are coefficients; and $\varepsilon$ is an unmodelled residual.
+\end{assumption}
 
 \paragraph{What is and is not claimed.}
-The first sentence of the proposition follows from how PLONKish layouts are built (weights are
-witness values), but we do not prove it for ezkl's implementation; it is the premise of the model.
+The first sentence of the assumption follows from how PLONKish layouts are built (weights are
+witness values), but we do not prove it for ezkl's implementation; it is the premise of the model.  It is supported empirically: assigned cells and calibrated $\logrows$
+were identical across three re-drawn weight and calibration-data seeds in every width-matched skeleton (Table~\ref{tab:matched}).
 We do not derive the coefficients or the accounting from assigned cells to rows analytically.
 Instead the coefficients are \emph{fitted} by non-negative least squares on a fit split of
 trained, calibrated networks and \emph{evaluated} on a disjoint split (Section~\ref{sec:results}),
 and the relation between assigned cells and $\logrows$ is checked empirically (Sections~\ref{sec:findings} and~\ref{sec:results}): the identity $\logrows=\lceil\log_2 C\rceil$ holds in the
-unnormalized width-matched skeletons but for only 163 of 234 trained networks (the calibrated $\logrows$ is lower in 52 and higher in 19), because $\logrows$ is the maximum of four resource requirements of which the cell count is one (Section~\ref{sec:results}).  The structural proxy
+unnormalized width-matched skeletons but for only 163 of 234 trained networks (the calibrated $\logrows$ is lower in 52 and higher in 19),
+and we do not assume it.  \emph{Empirically} (Section~\ref{sec:results}, 72 dumped circuits at $\logrows$ 19--23), ezkl reports $C/2$ rows and the calibrated $\logrows$ is the largest of four requirements
+(rows, constants, lookup table, range-check table), so $\logrows=\lceil\log_2 C\rceil$ holds only when another requirement binds exactly one level above the rows requirement $\lceil\log_2 C\rceil-1$.  The structural proxy
 used by the search is the same form with hand-set coefficients; the fitted
 version is reported alongside it.  $\varepsilon$ is reported only through the fit residuals.
 
@@ -343,7 +345,7 @@ Setting $\lambda=0$ recovers NEAR-only selection.
 \end{algorithmic}
 \end{algorithm}
 
-\textbf{Properties.}  The cost term is a deterministic, training-free model (Proposition~\ref{prop:cost}); how closely it
+\textbf{Properties.}  The cost term is a deterministic, training-free model (Assumption~\ref{prop:cost}); how closely it
 matches ezkl-calibrated $\logrows$ is measured in Section~\ref{sec:results}.  The budget in line~1 is applied either to the
 model's estimate or, when calibration has been run, to the calibrated $\logrows$; the search experiments use
 the latter, because the former can under- or over-estimate the circuit, and in them the cost term $\hat C$ is ezkl's calibrated cell count (an oracle cost) rather than the model's estimate.  The cost is one NEAR evaluation and one cost-model
@@ -403,7 +405,7 @@ assignments as the others ($0.99$--$1.06\times$ ReLU) but is calibrated at $\log
 other activations; ezkl's calibration also selected a lower input scale ($11$ versus $13$).  At equal assigned cells this is a circuit
 $2^{1}$ to $2^{4}$ times larger.  On trained networks calibrated with real inputs (Section~\ref{sec:ezkltrained}), 20 of the 24 calibrated unnormalized
 $x^3{+}x$ networks in the sweep are at $23$ and the rest between $24$ and $25$; with LayerNorm (15 networks) they range from $19$ to $25$.  Dumped ezkl settings
-show the mechanism (Section~\ref{sec:results}): the calibration adds a range check over $\pm2^{21}$, a table of $2^{22}$ entries, which forces $\logrows\ge23$.
+show the mechanism (Section~\ref{sec:results}): the calibration adds a range check over $\pm2^{21}$, a table of $2^{22}$ entries, which needs $\logrows=23$.
 
 \paragraph{Repeated draws.}
 Re-drawing weights and calibration data (three seeds, untrained) did not change any assignment count or $\logrows$ in Table~\ref{tab:matched}, and
@@ -439,7 +441,7 @@ TeleSparse~\citep{maheri2025telesparse} applies post-hoc sparsification and
 neural teleportation (to narrow activation ranges and hence lookup tables) to reduce
 proof time by $46\%$ at roughly $1\%$ accuracy cost.  This is complementary to
 our approach: TeleSparse compresses a fixed ReLU architecture after-the-fact;
-we identify ZK-efficient architectures by design before any training.  ZKML
+this work instead measures how circuit cost depends on the architecture and evaluates proxies for accuracy and cost (we do not claim a search method that improves on NEAR-only).  ZKML
 (EuroSys 2024) and ZEN (2021) optimize compiler passes; to our knowledge none
 searches over architecture space.  Two NAS works are close in name but not in
 goal: PASNet~\citep{peng2023pasnet} searches over polynomial-versus-ReLU activations
@@ -485,7 +487,7 @@ for polynomial and BN-free networks.
 % ============================================================
 
 \paragraph{Scope.}
-All experiments use CIFAR-10 inputs, MLPs, CNNs and ResNet-style networks, one ezkl version (9.5.0), and one host.  The largest calibrated circuit has $\logrows{=}26$ and the largest proved circuit $\logrows{\le}21$.  We make no
+All experiments use CIFAR-10 inputs, MLPs, CNNs and ResNet-style networks, one ezkl version (9.5.0), and one host.  The largest calibrated circuit in the analyses has $\logrows{=}25$ and the largest proved circuit $\logrows{=}22$.  We make no
 claim about transformers, ImageNet-scale inputs, other proving backends, or hardware other than the one used.  We expect a ResNet-50 on $224{\times}224$ ImageNet to need on the order of $\logrows{\approx}35$; this is an
 extrapolation, not a measurement.
 
@@ -497,7 +499,7 @@ We report results with and without the failed networks and with a common recipe,
 
 \paragraph{Calibration on trained networks, and pools.}
 Circuit-size results use trained seed-0 weights and $20$ real test images for calibration.  ezkl's calibration depends on the network and the calibration data, and we did not study its sensitivity to the number or choice of calibration images.
-Networks that failed to train, networks with estimated $\logrows>25$, and calibrations that failed inside ezkl are not in the search pools.  Search results therefore describe a pool of trainable, calibratable networks (ReLU networks are 28--33\% of each pool), and they do not penalize methods for selecting networks that would fail.
+Networks whose seed-0 training failed and networks with estimated $\logrows>25$ are not in the search pools (2 pool members fail in seed 1 or have mean accuracy below $15\%$ and are kept at their mean accuracy).  Search results therefore describe a pool of trainable, calibratable networks (ReLU networks are 28--33\% of each pool), and they do not penalize methods for selecting networks that would fail.
 
 \paragraph{Timings.}
 Real-proof timings cover seven architectures, were run on a host shared with other jobs, and use one real proof at logrows 22 (Table~\ref{tab:ezkl}).  They are indicative; circuit size ($\logrows$, assigned cells) is the measure we rely on.

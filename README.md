@@ -30,10 +30,10 @@ python make_tables.py && python render_results.py
 
 ## Main findings
 
-- **Cost model** (Eq. 1 in the paper): fitted by non-negative least squares on trained, calibrated networks and evaluated on a disjoint split and by cross-validation; about one assigned cell per multiply-accumulate and no per-node overhead. ezkl's `logrows` equals the maximum of four requirements (rows, constants, lookup table, range-check table) on all 72 dumped networks; the x^3+x anomaly is a 2^22-entry range-check table.
+- **Cost model** (Eq. 1 in the paper): fitted by non-negative least squares on trained, calibrated networks and evaluated on a disjoint split and by cross-validation; about one assigned cell per multiply-accumulate and no per-node overhead. ezkl's `logrows` equals the maximum of four requirements (rows, constants, lookup table, range-check table) on all 72 dumped networks; the x^3+x anomaly is a range-check table spanning 2^22+1 values (needing logrows 23).
 - **Negative result**: width-matched, ReLU and x^2 networks have the same calibrated logrows (untrained and trained). A claim in an earlier version that ReLU is much more expensive than x^2 is withdrawn.
-- **Proxies**: NEAR predicts accuracy only on ReLU networks; ZenNAS is anti-correlated; a pre-activation-sign NASWOT variant is negatively correlated on polynomial networks; ZiCo's success on x^3+x disappears when failed runs are removed. 38-60% of polynomial networks fail to train.
-- **Search**: under ezkl-calibrated budgets a tuned joint proxy is indistinguishable from NEAR-only (an earlier claim of a gain is withdrawn).
+- **Proxies**: NEAR predicts accuracy only on ReLU networks; ZenNAS is anti-correlated; a pre-activation-sign NASWOT variant is negatively correlated on polynomial networks; ZiCo's success on x^3+x disappears when failed runs are removed. 39-60% of polynomial networks fail to train.
+- **Search**: under ezkl-calibrated budgets a tuned joint proxy shows no consistent gain over NEAR-only (an earlier claim of a gain is withdrawn).
 
 ## Not included
 
@@ -51,3 +51,5 @@ earlier version of this work; they are superseded and are not used by the curren
 ```bash
 pip install -e ".[dev,ezkl]"
 ```
+
+`docs/` contains notes from earlier versions of this work (including `docs/theory.md` with proofs that are no longer in the paper); the paper is authoritative.

@@ -1,22 +1,22 @@
 \begin{table}[h]
 \centering
-\caption{Untuned test of the joint proxy: mean regret (accuracy points) on the evaluation halves for each \emph{fixed} $\lambda$ (columns), averaged over 300 splits;
-  $\lambda=0$ is NEAR-only.  The last column is the tuned joint proxy, whose tuning breaks ties toward the smaller $\lambda$.  Upper block $K=10$, lower block $K=5$.}
+\caption{Untuned test of the joint proxy.  For each \emph{fixed} $\lambda>0$, the per-split paired difference in regret (accuracy points) relative to $\lambda=0$ (NEAR-only) on the evaluation halves: mean, $2.5$--$97.5$ percentile range over 300 splits, and in parentheses the percentage of splits in which
+  it is better / worse (negative difference = better than NEAR-only).  The third column is NEAR-only's mean regret.  Upper block $K=10$, lower block $K=5$.}
 \label{tab:lambda}
-\small
-\begin{tabular}{rrrrrrrrr}
+\scriptsize
+\begin{tabular}{rrrrrrrr}
 \toprule
-$B$ & pool & $\lambda{=}0$ & $\lambda{=}0.25$ & $\lambda{=}0.5$ & $\lambda{=}1$ & $\lambda{=}2$ & $\lambda{=}4$ & tuned \\
+$B$ & pool & $\lambda{=}0$ & $\lambda{=}0.25$ & $\lambda{=}0.5$ & $\lambda{=}1$ & $\lambda{=}2$ & $\lambda{=}4$ \\
 \midrule
-$\le20$ & 36 & 0.02 & 0.02 & 0.02 & 0.20 & 0.77 & 0.99 & 0.02 \\
-$\le21$ & 72 & 0.04 & 0.04 & 0.06 & 0.99 & 5.97 & 6.38 & 0.04 \\
-$\le22$ & 111 & 0.33 & 0.40 & 1.11 & 5.65 & 17.99 & 18.23 & 0.33 \\
-$\le23$ & 175 & 3.61 & 2.93 & 3.23 & 5.76 & 18.07 & 18.38 & 3.39 \\
+$\le20$ & 36 & 0.02 & +0.00 {\scriptsize[+0.00,+0.00]} {\scriptsize(0/0)} & +0.00 {\scriptsize[+0.00,+0.00]} {\scriptsize(0/0)} & +0.18 {\scriptsize[+0.00,+3.08]} {\scriptsize(0/14)} & +0.75 {\scriptsize[+0.00,+5.84]} {\scriptsize(0/27)} & +0.97 {\scriptsize[+0.00,+5.84]} {\scriptsize(0/31)} \\
+$\le21$ & 72 & 0.04 & +0.00 {\scriptsize[+0.00,+0.00]} {\scriptsize(0/0)} & +0.02 {\scriptsize[+0.00,+0.00]} {\scriptsize(0/1)} & +0.95 {\scriptsize[+0.00,+5.16]} {\scriptsize(0/28)} & +5.94 {\scriptsize[+0.00,+14.54]} {\scriptsize(0/94)} & +6.34 {\scriptsize[+0.45,+14.54]} {\scriptsize(0/98)} \\
+$\le22$ & 111 & 0.33 & +0.07 {\scriptsize[+0.00,+1.37]} {\scriptsize(0/3)} & +0.78 {\scriptsize[+0.00,+6.53]} {\scriptsize(0/25)} & +5.32 {\scriptsize[+0.00,+15.02]} {\scriptsize(0/88)} & +17.66 {\scriptsize[+10.48,+25.77]} {\scriptsize(0/99)} & +17.90 {\scriptsize[+10.59,+25.09]} {\scriptsize(0/100)} \\
+$\le23$ & 175 & 3.61 & -0.68 {\scriptsize[-5.98,+0.00]} {\scriptsize(18/0)} & -0.38 {\scriptsize[-5.98,+3.39]} {\scriptsize(16/3)} & +2.14 {\scriptsize[+0.00,+10.91]} {\scriptsize(0/42)} & +14.46 {\scriptsize[+8.22,+22.72]} {\scriptsize(0/100)} & +14.77 {\scriptsize[+9.27,+24.40]} {\scriptsize(0/100)} \\
 \midrule
-$\le20$ & 36 & 0.88 & 0.61 & 0.33 & 2.93 & 3.11 & 3.50 & 0.91 \\
-$\le21$ & 72 & 0.39 & 0.19 & 0.49 & 6.39 & 9.26 & 9.79 & 0.52 \\
-$\le22$ & 111 & 4.17 & 4.12 & 4.58 & 11.70 & 20.95 & 21.31 & 4.17 \\
-$\le23$ & 175 & 7.07 & 7.34 & 7.13 & 7.76 & 21.87 & 22.44 & 7.72 \\
+$\le20$ & 36 & 0.88 & -0.27 {\scriptsize[-3.43,+0.14]} {\scriptsize(10/3)} & -0.56 {\scriptsize[-3.55,+2.21]} {\scriptsize(25/16)} & +2.05 {\scriptsize[-3.43,+8.90]} {\scriptsize(16/59)} & +2.23 {\scriptsize[-3.43,+9.03]} {\scriptsize(20/54)} & +2.61 {\scriptsize[-3.43,+9.03]} {\scriptsize(20/57)} \\
+$\le21$ & 72 & 0.39 & -0.20 {\scriptsize[-2.58,+0.00]} {\scriptsize(6/0)} & +0.10 {\scriptsize[-2.58,+2.87]} {\scriptsize(7/7)} & +6.00 {\scriptsize[+0.00,+15.06]} {\scriptsize(1/75)} & +8.87 {\scriptsize[+0.74,+15.06]} {\scriptsize(1/99)} & +9.40 {\scriptsize[+0.74,+15.06]} {\scriptsize(1/99)} \\
+$\le22$ & 111 & 4.17 & -0.05 {\scriptsize[-2.44,+0.00]} {\scriptsize(3/2)} & +0.41 {\scriptsize[+0.00,+6.53]} {\scriptsize(1/10)} & +7.53 {\scriptsize[+0.00,+23.07]} {\scriptsize(0/76)} & +16.78 {\scriptsize[+9.78,+25.54]} {\scriptsize(0/100)} & +17.14 {\scriptsize[+9.78,+25.54]} {\scriptsize(0/100)} \\
+$\le23$ & 175 & 7.07 & +0.27 {\scriptsize[-5.63,+5.75]} {\scriptsize(6/11)} & +0.05 {\scriptsize[-5.63,+5.75]} {\scriptsize(9/14)} & +0.69 {\scriptsize[-5.63,+10.40]} {\scriptsize(24/33)} & +14.80 {\scriptsize[+4.85,+20.38]} {\scriptsize(0/100)} & +15.37 {\scriptsize[+4.85,+20.38]} {\scriptsize(0/100)} \\
 \bottomrule
 \end{tabular}
 \end{table}
