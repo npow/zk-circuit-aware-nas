@@ -446,6 +446,7 @@ def section_E(calib, val_names, arch=None):
         res["fit_split_arch_types"] = dict(collections.Counter(t for t, v in zip(types, is_val) if not v))
     # does ceil(log2(assignments)) equal logrows? (accounting check)
     d = np.ceil(np.log2(y)) - lr
+    res["ceil_log2_vs_logrows_direction"] = {"equal": int((d == 0).sum()), "logrows_below": int((d > 0).sum()), "logrows_above": int((d < 0).sum()), "n": int(len(d))}
     res["assignments_ceil_log2_equals_logrows"] = {a: {"n": int((acts == a).sum()), "equal": int(((d == 0) & (acts == a)).sum())} for a in ("relu", "x2", "x2px", "x3px")}
     return res
 
@@ -468,13 +469,16 @@ def section_G(dump_dirs, arch):
             act = next((a for a in ("x3px", "x2px", "x2", "relu") if f"_{a}_" in name), "?")
             recs[name] = {"logrows": ra["logrows"], "pred": pred, "need": need, "act": act, "big_rc": need["range_check"] >= 22, "scale": ra.get("input_scale"),
                           "binding": [k for k, v in need.items() if v == pred], "rows_x2_eq_assign": st["total_assignments"] == 2 * st["num_rows"] or abs(st["total_assignments"] - 2 * st["num_rows"]) <= 2,
-                          "const": st["total_const_size"], "params": (arch.get(name) or {}).get("params")}
+                          "const": st["total_const_size"], "cells": st["total_assignments"], "params": (arch.get(name) or {}).get("params")}
     n = len(recs)
     out = {"n": n, "exact": sum(r["pred"] == r["logrows"] for r in recs.values()),
            "by_act": {a: {"n": sum(r["act"] == a for r in recs.values()), "exact": sum(r["act"] == a and r["pred"] == r["logrows"] for r in recs.values())} for a in ("relu", "x2", "x2px", "x3px")},
            "big_range_check_by_act": {a: sum(r["act"] == a and r["big_rc"] for r in recs.values()) for a in ("relu", "x2", "x2px", "x3px")},
            "binding_counts": dict(collections.Counter(b for r in recs.values() for b in r["binding"])),
            "pred_minus_logrows": dict(collections.Counter(r["pred"] - r["logrows"] for r in recs.values())),
+           "logrows_range": [min(r["logrows"] for r in recs.values()), max(r["logrows"] for r in recs.values())],
+           "const_requirement_equals_ceil_log2_cells": sum(r["need"]["const"] == L(r["cells"]) for r in recs.values()),
+           "rows_requirement_is_ceil_log2_cells_minus_1": sum(r["need"]["rows"] == L(r["cells"]) - 1 for r in recs.values()),
            "rows_equal_half_assignments": sum(r["rows_x2_eq_assign"] for r in recs.values()),
            "mismatches": [{"name": k, "logrows": r["logrows"], "pred": r["pred"], "need": r["need"]} for k, r in recs.items() if r["pred"] != r["logrows"]][:20]}
     out["const_over_params"] = {}

@@ -2237,41 +2237,41 @@
      "exact": 1.0,
      "n": 16
     },
-    "fitted/mlp": {
-     "exact": 0.8269230769230769,
-     "n": 52
-    },
     "fitted/dws_cnn": {
      "exact": 0.44361702127659575,
      "n": 47
     },
-    "fitted/cnn": {
-     "exact": 0.7622641509433963,
-     "n": 53
+    "fitted/mlp": {
+     "exact": 0.8269230769230769,
+     "n": 52
     },
     "fitted/dws_resnet": {
      "exact": 0.6583333333333333,
      "n": 66
     },
+    "fitted/cnn": {
+     "exact": 0.7622641509433963,
+     "n": 53
+    },
     "hand/resnet": {
      "exact": 1.0,
      "n": 16
-    },
-    "hand/mlp": {
-     "exact": 0.8269230769230769,
-     "n": 52
     },
     "hand/dws_cnn": {
      "exact": 0.425531914893617,
      "n": 47
     },
-    "hand/cnn": {
-     "exact": 0.7169811320754715,
-     "n": 53
+    "hand/mlp": {
+     "exact": 0.8269230769230769,
+     "n": 52
     },
     "hand/dws_resnet": {
      "exact": 0.6515151515151516,
      "n": 66
+    },
+    "hand/cnn": {
+     "exact": 0.7169811320754715,
+     "n": 53
     }
    }
   },
@@ -2286,6 +2286,12 @@
    "mlp": 33,
    "dws_resnet": 66,
    "resnet": 16
+  },
+  "ceil_log2_vs_logrows_direction": {
+   "equal": 163,
+   "logrows_below": 52,
+   "logrows_above": 19,
+   "n": 234
   },
   "assignments_ceil_log2_equals_logrows": {
    "relu": {
@@ -2342,6 +2348,12 @@
   "pred_minus_logrows": {
    "0": 72
   },
+  "logrows_range": [
+   19,
+   23
+  ],
+  "const_requirement_equals_ceil_log2_cells": 53,
+  "rows_requirement_is_ceil_log2_cells_minus_1": 72,
   "rows_equal_half_assignments": 62,
   "mismatches": [],
   "const_over_params": {

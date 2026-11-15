@@ -124,6 +124,8 @@ put("fit_exact", fe["exact_logrows"]); put("fit_w1", fe["within1"]); put("fit_rh
 put("hand_exact", he["exact_logrows"]); put("hand_w1", he["within1"]); put("hand_rho", f"{he['spearman_logrows']:.2f}"); put("hand_rmse", f"{he['log2_rmse_assignments']:.2f}")
 for k, v in E["coef"].items():
     put(f"coef_{k}", f"{v:.2f}")
+dr = E["ceil_log2_vs_logrows_direction"]
+put("dir_equal", dr["equal"]); put("dir_below", dr["logrows_below"]); put("dir_above", dr["logrows_above"]); put("dir_n", dr["n"]); put("dir_equal_pct", f"{100*dr['equal']/dr['n']:.0f}")
 ce = E["assignments_ceil_log2_equals_logrows"]
 for a in ("relu", "x2", "x2px", "x3px"):
     put(f"ceil_{a}", f"{ce[a]['equal']}/{ce[a]['n']}")
@@ -159,6 +161,8 @@ if G:
     put("g_cp_mlp", f"{cp['mlp']['median']:.1f}" if "mlp" in cp else "n/a")
     put("g_cp_conv_min", f"{cp['conv']['min']:.0f}" if "conv" in cp else "n/a"); put("g_cp_conv_max", f"{cp['conv']['max']:.0f}" if "conv" in cp else "n/a")
     put("g_mismatch_n", G["n"] - G["exact"])
+    put("g_lr_min", G["logrows_range"][0]); put("g_lr_max", G["logrows_range"][1])
+    put("g_const_eq", G["const_requirement_equals_ceil_log2_cells"]); put("g_rows_m1", G["rows_requirement_is_ceil_log2_cells_minus_1"])
     for a in ("relu", "x2", "x2px", "x3px"):
         put(f"g_bigrc_{a}", G["big_range_check_by_act"][a])
     put("g_bigrc_other", sum(G["big_range_check_by_act"][a] for a in ("relu", "x2", "x2px")))
@@ -172,6 +176,8 @@ for B_ in (20, 21, 22, 23):
     e = D[f"B<={B_}"]; rb = e["regret_by_lambda_untuned"]
     put(f"lam_best{B_}", f"{min(rb, key=lambda k: rb[k])}"); put(f"lam_reg0_{B_}", f"{rb['0.0']:.2f}"); put(f"lam_regmin_{B_}", f"{min(rb.values()):.2f}")
     put(f"lam_reg4_{B_}", f"{rb['4.0']:.2f}")
+    r5 = D5[f"B<={B_}"]["regret_by_lambda_untuned"]
+    put(f"lam5_best{B_}", min(r5, key=lambda k: r5[k])); put(f"lam5_reg0_{B_}", f"{r5['0.0']:.2f}"); put(f"lam5_regmin_{B_}", f"{min(r5.values()):.2f}")
 
 # ----- multi-seed validation (released rerun) -----
 import os

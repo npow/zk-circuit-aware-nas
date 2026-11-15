@@ -60,13 +60,13 @@ can be checked against the prover, yet NAS work on ZK has relied on untested cos
 CIFAR-10 MLPs, CNNs and ResNet-style networks.  \textbf{(1) Cost model.}  A parametric model of assigned cells, with coefficients fitted on 180 trained, calibrated networks
 and evaluated on 54 held-out ones, matches ezkl-calibrated $\logrows$ exactly for 39 and within one for 51
 (Spearman 0.84; cross-validated over all 234 networks: 70\% exact, 95\% within one).  The mismatches have a mechanism: on 72 dumped ezkl settings, $\logrows$
-is exactly the maximum of four resource requirements (rows, constants, lookup table, range-check table; 72 of 72), of which cell count is one.
+is exactly the maximum of four resource requirements (rows, constants, lookup table, range-check table; 72 of 72 sampled networks at $\logrows$ 19--23), of which cell count is one.
 \textbf{(2) A negative result.}  Width-matched, ReLU and $x^2$ networks have the same calibrated $\logrows$ (all 5 skeletons; 45 of 50 matched pairs in the sweep), contradicting the assumption
 that polynomial activations are cheaper to prove in ezkl; unnormalized $x^3{+}x$ networks calibrate to a circuit up to $16\times$ larger at equal cell count because their range-check table has $2^{22}$ entries.
 \textbf{(3) Benchmark.}  We release zkml-bench, 474 networks with two training seeds and proxy scores.  NEAR predicts accuracy only for ReLU networks
 ($\rho=+0.70$) and is indistinguishable from zero on all three polynomial families; ZenNAS is anti-correlated on polynomial networks; a sign-pattern NASWOT variant is negatively correlated on polynomial networks;
 ZiCo's apparent success on $x^3{+}x$ disappears once failed training runs are removed.  Between 39\% and 60\% of polynomial networks fail to train.
-\textbf{(4) Search.}  With budgets set on ezkl-calibrated circuit size, a tuned joint accuracy-cost proxy is indistinguishable from NEAR-only, which beats random selection; we
+\textbf{(4) Search.}  With budgets set on ezkl-calibrated circuit size, a tuned joint accuracy-cost proxy almost always reduces to NEAR-only and shows no consistent gain over it, while NEAR-only beats random selection; we
 withdraw an earlier claim of a joint-proxy gain.  Filtering by the cost model's estimate removes most but not all budget violations.
 Scope: CIFAR-10, one ezkl version, calibration on trained networks with real inputs, real proofs for seven architectures.
 \end{abstract}
@@ -185,9 +185,9 @@ where $\mathcal{M}$ is the set of Gemm, MatMul and Conv nodes, with
 $\mathrm{MAC}=n_{\mathrm{in}}n_{\mathrm{out}}$ for a Gemm node and
 $\mathrm{MAC}=h'w'\,c_{\mathrm{out}}\,(c_{\mathrm{in}}/g)\,k_hk_w$ for a Conv node with output
 spatial size $h'\times w'$ and $g$ groups; $\mathrm{el}(v)$ is the number of output elements;
-$\beta_o,\gamma,\alpha_o\ge 0$ are coefficients; and $\varepsilon$ is an unmodelled residual.  The circuit has
-$2^{\logrows}$ rows with $\logrows=\lceil\log_2 C\rceil$ whenever calibration does not change $(s,R)$
-in a way that forces a larger table.
+$\beta_o,\gamma,\alpha_o\ge 0$ are coefficients; and $\varepsilon$ is an unmodelled residual.  ezkl reports
+$C/2$ rows, and the calibrated $\logrows$ is the largest of four requirements (rows, constants, lookup table, range-check table; Section~\ref{sec:results}), so
+$\logrows=\lceil\log_2 C\rceil$ holds only when some other requirement binds exactly one level above the rows requirement $\lceil\log_2 C\rceil-1$.
 \end{proposition}
 
 \paragraph{What is and is not claimed.}
@@ -197,7 +197,7 @@ We do not derive the coefficients or the accounting from assigned cells to rows 
 Instead the coefficients are \emph{fitted} by non-negative least squares on a fit split of
 trained, calibrated networks and \emph{evaluated} on a disjoint split (Section~\ref{sec:results}),
 and the relation between assigned cells and $\logrows$ is checked empirically (Sections~\ref{sec:findings} and~\ref{sec:results}): the identity $\logrows=\lceil\log_2 C\rceil$ holds in the
-unnormalized width-matched skeletons but only for a majority of trained networks, because $\logrows$ is the maximum of four resource requirements of which the cell count is one (Section~\ref{sec:results}).  The structural proxy
+unnormalized width-matched skeletons but for only 163 of 234 trained networks (the calibrated $\logrows$ is lower in 52 and higher in 19), because $\logrows$ is the maximum of four resource requirements of which the cell count is one (Section~\ref{sec:results}).  The structural proxy
 used by the search is the same form with hand-set coefficients; the fitted
 version is reported alongside it.  $\varepsilon$ is reported only through the fit residuals.
 
@@ -403,7 +403,7 @@ assignments as the others ($0.99$--$1.06\times$ ReLU) but is calibrated at $\log
 other activations; ezkl's calibration also selected a lower input scale ($11$ versus $13$).  At equal assigned cells this is a circuit
 $2^{1}$ to $2^{4}$ times larger.  On trained networks calibrated with real inputs (Section~\ref{sec:ezkltrained}), 20 of the 24 calibrated unnormalized
 $x^3{+}x$ networks in the sweep are at $23$ and the rest between $24$ and $25$; with LayerNorm (15 networks) they range from $19$ to $25$.  Dumped ezkl settings
-show the mechanism (Section~\ref{sec:results}): the calibration adds a range check over $\pm2^{21}$, a table of $2^{22}$ entries, which forces $\logrows=23$.
+show the mechanism (Section~\ref{sec:results}): the calibration adds a range check over $\pm2^{21}$, a table of $2^{22}$ entries, which forces $\logrows\ge23$.
 
 \paragraph{Repeated draws.}
 Re-drawing weights and calibration data (three seeds, untrained) did not change any assignment count or $\logrows$ in Table~\ref{tab:matched}, and
@@ -459,7 +459,7 @@ agrees with their layer-level activation measurements.
 \paragraph{MPC/FHE NAS.}
 CryptoNAS~\citep{ghodsi2020cryptonas} minimizes ReLU count for MPC (garbled circuits).  In MPC, linear layers are free via
 secret sharing; in ZK-SNARKs they are not.  In our fitted cost model multiply-accumulates cost about one assigned cell each
-while a ReLU element costs about 15.04 cells (Section~\ref{sec:results}), so at the widths we test the multiply-accumulate cells dominate and ReLU count would be a poor proxy for
+while a ReLU element costs about 14.82 cells (Section~\ref{sec:results}), so at the widths we test the multiply-accumulate cells dominate and ReLU count would be a poor proxy for
 circuit size; we did not evaluate CryptoNAS itself.  LinGCN (NeurIPS 2023) linearizes nonlinear layers for homomorphically encrypted
 inference, where multiplicative depth is the relevant cost; in our ZK setting the cost model depends on circuit size across all layers.
 

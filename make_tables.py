@@ -262,7 +262,7 @@ if G:
     OUT.append(r"""\begin{table}[h]
 \centering
 \caption{Test of the four-resource rule $\logrows=\max(\lceil\log_2\text{rows}\rceil,\lceil\log_2\text{const}\rceil,\lceil\log_2\text{lookup span}\rceil,\lceil\log_2\text{range-check span}\rceil)$
-  on ezkl's dumped \texttt{settings.json} for """ + str(G["n"]) + r""" trained networks (a stratified sample, assigned cells below $2.2$M).  The binding resource (ties counted for each) was
+  on ezkl's dumped \texttt{settings.json} for """ + str(G["n"]) + r""" trained networks (a random sample of up to $30$ per activation among networks under $2.2$M assigned cells, plus $11$ chosen earlier; $\logrows$ range """ + f"{G['logrows_range'][0]}--{G['logrows_range'][1]}" + r""" ).  The binding resource (ties counted for each) was
   rows in """ + str(bc.get("rows", 0)) + r""", constants in """ + str(bc.get("const", 0)) + r""", lookup table in """ + str(bc.get("lookup", 0)) + r""" and range-check table in """ + str(bc.get("range_check", 0)) + r""" networks.}
 \label{tab:accounting}
 \small
