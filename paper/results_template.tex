@@ -56,11 +56,11 @@ This job replaces an earlier three-seed validation run on a different GPU whose 
 Table~\ref{tab:corr} gives Spearman $\rho$ between each proxy and mean accuracy per activation family with bootstrap intervals and Holm-adjusted
 significance over the @@n_tests@@ activation-family tests it contains.  NEAR is a reliable predictor only for ReLU networks
 ($\rho=@@A_near_relu@@$, $95\%$ CI $[@@A_near_relu_lo@@,@@A_near_relu_hi@@]$); on the polynomial families its intervals include zero
-($x^2$ @@A_near_x2@@ $[@@A_near_x2_lo@@,@@A_near_x2_hi@@]$, $x^3{+}x$ @@A_near_x3px@@, $x^2{+}x$ @@A_near_x2px@@).  ZenNAS is negatively correlated with accuracy in every family in this analysis
+($x^2$ @@A_near_x2@@ $[@@A_near_x2_lo@@,@@A_near_x2_hi@@]$, $x^3{+}x$ @@A_near_x3px@@, $x^2{+}x$ @@A_near_x2px@@).  The Zen-style score (our variant, Section~\ref{sec:theory}; not the published Zen-Score) is negatively correlated with accuracy in every family in this analysis
 (ReLU @@A_zenas_relu@@, $x^2$ @@A_zenas_x2@@, $x^3{+}x$ @@A_zenas_x3px@@, $x^2{+}x$ @@A_zenas_x2px@@), but not robustly: with a common training recipe its ReLU correlation is @@C_zenas_relu@@ (Table~\ref{tab:corrsame}) and its partial correlation on ReLU is @@A_zenas_relu_partial@@.  ZiCo is the one proxy with a significant positive coefficient on a polynomial family
 ($x^3{+}x$, @@A_zico_x3px@@), but once failed networks are removed (Table~\ref{tab:corrnofail}) it is @@B_zico_x3px@@ on $x^3{+}x$ and @@B_zico_x2@@ on $x^2$:
 its apparent success on $x^3{+}x$ comes from separating networks that train from networks that do not, not from ranking accuracy among those that train.
-Removing failed networks changes other conclusions too: Holm-significant entries lost are @@sig_lost@@; entries gained are @@sig_gained@@.  The negative correlations of ZenNAS and of the sign-pattern NASWOT variant are therefore partly trainability effects.
+Removing failed networks changes other conclusions too: Holm-significant entries lost are @@sig_lost@@; entries gained are @@sig_gained@@.  The negative correlations of the Zen-style score and of the sign-pattern NASWOT variant are therefore partly trainability effects.
 MeCo and Synflow are weak or inconsistent.
 
 Two controls address confounds.  Table~\ref{tab:corrsame} restricts to normalized networks, where every activation was trained with the same recipe, and the picture is the same
@@ -83,12 +83,12 @@ therefore not only a missing-module artifact.
 
 \input{tables/naswot}
 
-\subsection{ZenNAS}
+\subsection{The Zen-Style Score}
 
-Among the @@zen_n@@ polynomial networks without normalization, the Zen score is weakly negatively correlated with accuracy ($\rho=@@zen_acc@@$), positively correlated with depth ($@@zen_depth@@$)
-and with $\log$ parameter count ($@@zen_params@@$), and the failure rate is @@zen_fail_top@@\% in the top Zen quartile against @@zen_fail_bot@@\% in the bottom quartile
+Among the @@zen_n@@ polynomial networks without normalization, the Zen-style score is weakly negatively correlated with accuracy ($\rho=@@zen_acc@@$), positively correlated with depth ($@@zen_depth@@$)
+and with $\log$ parameter count ($@@zen_params@@$), and the failure rate is @@zen_fail_top@@\% in the top Zen-style quartile against @@zen_fail_bot@@\% in the bottom quartile
 (@@zen_fail_all@@\% overall).  Excluding failed networks, the correlation with accuracy is @@zen_acc_ok@@ ($n=@@zen_n_ok@@$).  Among the @@zenr_n@@ ReLU networks without normalization it is @@zenr_acc@@, with $\log$ parameter count @@zenr_params@@.
-This is descriptive: it is consistent with Zen rewarding size and depth, which are not what determines accuracy here, but we do not claim a mechanism.
+This is descriptive: it is consistent with this variant rewarding size and depth, which are not what determines accuracy here, but we do not claim a mechanism.
 
 \subsection{ezkl Circuit Size and Timings on Trained Networks}
 \label{sec:ezkltrained}

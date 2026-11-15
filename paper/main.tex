@@ -65,7 +65,7 @@ is exactly the maximum of four resource requirements (rows, constants, lookup ta
 \textbf{(2) A negative result.}  Width-matched, ReLU and $x^2$ networks have the same calibrated $\logrows$ (all 5 skeletons; 45 of 50 matched pairs in the sweep), contradicting the assumption
 that polynomial activations are cheaper to prove in ezkl; unnormalized $x^3{+}x$ networks calibrate to a circuit up to $16\times$ larger at equal cell count because their range-check table spans $2^{22}+1$ values.
 \textbf{(3) Benchmark.}  We release zkml-bench, 474 networks with two training seeds and proxy scores.  NEAR predicts accuracy only for ReLU networks
-($\rho=+0.70$) and is indistinguishable from zero on all three polynomial families; ZenNAS is anti-correlated on polynomial networks; a sign-pattern NASWOT variant is negatively correlated on polynomial networks;
+($\rho=+0.70$) and is indistinguishable from zero on all three polynomial families; a Zen-style score (our variant, not the published Zen-Score protocol) is anti-correlated on polynomial networks; a sign-pattern NASWOT variant is negatively correlated on polynomial networks;
 ZiCo's apparent success on $x^3{+}x$ disappears once failed training runs are removed.  Between 39\% and 60\% of polynomial networks fail to train.
 \textbf{(4) Search.}  With budgets set on ezkl-calibrated circuit size, a tuned joint accuracy-cost proxy almost always reduces to NEAR-only and shows no consistent gain over it, while NEAR-only beats random selection; we
 withdraw an earlier claim of a joint-proxy gain.  Filtering by the cost model's estimate removes most but not all budget violations.
@@ -255,10 +255,13 @@ constant.  (iii) To avoid the confound we also evaluate a heuristic generalizati
 $\mathbf{1}[\text{pre-activation}>0]$ at the input of every activation module; for ReLU it equals the
 standard score, and for polynomial networks it is defined.  This variant is not part of the NASWOT paper.
 
-\paragraph{Zen-NAS.}
-We implement the Zen score as $\mathrm{Zen}(f)=\mathbb{E}_{x,\epsilon}\log\|f(x+\epsilon)-f(x)\|_2
-+\log\mathbb{E}\,[\operatorname{std}_{\text{batch}} f(x)]$ with $x\sim\mathcal{N}(0,I)$ and
-$\epsilon\sim\mathcal{N}(0,10^{-4}I)$.  In an earlier version we gave a scaling argument for its
+\paragraph{A Zen-style score (a variant of Zen-NAS, not the published protocol).}
+Lin et al.~\citep{lin2021zen} (Algorithm~1) compute the Zen-Score on the feature map before global average pooling, after removing the residual links, and add a term that sums
+$\log\sqrt{\text{mean batch-norm variance}}$ over the batch-norm layers.  We did \emph{not} implement that protocol.  Our score is
+$\mathrm{Zen\text{-}style}(f)=\mathbb{E}_{x,\epsilon}\log\|f(x+\epsilon)-f(x)\|_2+\log\mathbb{E}\,[\operatorname{std}_{\text{batch}} f(x)]$ with $x\sim\mathcal{N}(0,I)$ and
+$\epsilon\sim\mathcal{N}(0,10^{-4}I)$, and it differs from the published score in four ways: (i) it is computed on the network \emph{output} (logits), not the pre-pooling feature map; (ii) residual links of ResNet-style networks are \emph{kept};
+(iii) it has no batch-norm-variance term (our networks use no BatchNorm, and we do not substitute a LayerNorm or GroupNorm statistic) and instead adds $\log\mathbb{E}[\operatorname{std}_{\text{batch}}f(x)]$ as a second term; and (iv) the perturbation and input scales are fixed as stated.
+Every result labelled Zen-style concerns this variant and \emph{not} the published Zen-Score; we draw no conclusion about the published proxy.  In an earlier version we gave a scaling argument for its
 anti-correlation with accuracy on polynomial networks; because the inputs are fixed at unit
 scale the argument as stated is not well defined, so we withdraw it and instead report the
 empirical dependence of the score on depth, size and training failure (Section~\ref{sec:results}).
@@ -308,7 +311,7 @@ initialization, and, for the calibrated subset, ezkl's calibrated $\logrows$ and
 \midrule
 Synflow  & \citet{tanaka2020synflow}   & \checkmark & \checkmark \\
 NEAR     & \citet{husistein2025near}  & $\times$ (1 batch) & \checkmark \\
-ZenNAS   & \citet{lin2021zen}          & \checkmark (Gaussian) & \checkmark \\
+Zen-style (variant) & after \citet{lin2021zen} & \checkmark (Gaussian) & \checkmark \\
 ZiCo     & \citet{li2023zico}          & $\times$ (1 batch) & \checkmark \\
 MeCo     & \citet{jiang2023meco}       & \checkmark & \checkmark \\
 NASWOT   & \citet{mellor2021naswot}    & $\times$ & \textbf{No} (Proposition~\ref{prop:naswot}) \\
@@ -508,7 +511,7 @@ Real-proof timings cover seven architectures, were run on a host shared with oth
 Per-architecture results for both seeds, calibration records with fitting features, and the scripts that generate every table are released.  Trained weights (about 0.7 GB) are not.
 
 \paragraph{What we do not claim.}
-We do not claim that polynomial activations are cheaper to prove, that the joint accuracy-cost proxy improves search, that the cost model is exact, or that any tested proxy predicts accuracy across activation families.
+We make no claim about the published Zen-Score (our Zen-style score is a variant that differs in four respects, Section~\ref{sec:theory}).  We do not claim that polynomial activations are cheaper to prove, that the joint accuracy-cost proxy improves search, that the cost model is exact, or that any tested proxy predicts accuracy across activation families.
 
 
 \section{Conclusion}
@@ -517,7 +520,7 @@ We do not claim that polynomial activations are cheaper to prove, that the joint
 
 We evaluated ZK circuit cost and zero-cost accuracy proxies against ezkl on trained CIFAR-10 networks.  A parametric cell-count model fitted on 180 networks matches ezkl-calibrated $\logrows$ exactly for 39 of 54
 held-out networks and within one for 51, with weak agreement for $x^3{+}x$.  Width-matched, ReLU and $x^2$ networks have the same circuit size, which contradicts the common assumption that polynomial activations
-are cheaper to prove in ezkl; the largest cost differences we found come from layer type, width and ezkl's range calibration.  NEAR predicts accuracy for ReLU networks only, ZenNAS and a NASWOT variant are anti-correlated on polynomial networks, and
+are cheaper to prove in ezkl; the largest cost differences we found come from layer type, width and ezkl's range calibration.  NEAR predicts accuracy for ReLU networks only, a Zen-style score (our variant of Zen-NAS) and a NASWOT variant are anti-correlated on polynomial networks, and
 under budgets set on calibrated circuit size a joint accuracy-cost proxy does not improve on NEAR-only.  The cost model is most useful as a pre-filter: it removes most, not all, budget violations without running ezkl.
 
 The zkml-bench code, per-architecture results for both seeds, calibration records, and the scripts that regenerate every table are at

@@ -552,7 +552,10 @@ def zenas_score(
     n_samples: int = 32,
     sigma: float = 1e-2,
 ) -> float:
-    """Compute the Zen-NAS score (Lin et al., ICCV 2021, arXiv:2102.01063).
+    """Compute a Zen-style score, a VARIANT of Zen-NAS (Lin et al., ICCV 2021, arXiv:2102.01063).
+
+    NOT the published Zen-Score protocol: it is computed on the network output (not the pre-GAP feature map),
+    keeps residual links, and has no batch-norm-variance term (it adds log E[std over batch of the output] instead).
 
     Zen(f) = log(E[‖f(x+ε) − f(x)‖₂]) + log(E[std(f(x))])
 

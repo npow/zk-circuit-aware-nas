@@ -53,7 +53,7 @@ put("n_failed_poly_pct_max", f"{100*max(nf[k]/na[k] for k in ('x2','x3px','x2px'
 # which Holm-significant entries change when failed networks are removed
 sigA = {k for k, e in A.items() if "p_holm" in e and e["p_holm"] < 0.05}
 sigB = {k for k, e in A2.items() if "p_holm" in e and e["p_holm"] < 0.05}
-nm = {"near": "NEAR", "synflow": "Synflow", "zico": "ZiCo", "meco": "MeCo", "zenas": "ZenNAS", "naswot": "NASWOT", "naswot_sign": "NASWOT-sign"}
+nm = {"near": "NEAR", "synflow": "Synflow", "zico": "ZiCo", "meco": "MeCo", "zenas": "Zen-style", "naswot": "NASWOT", "naswot_sign": "NASWOT-sign"}
 fm = {"relu": "ReLU", "x2": "$x^2$", "x3px": "$x^3{+}x$", "x2px": "$x^2{+}x$"}
 def lab(k):
     f, p = k.split("/"); return f"{nm[p]} on {fm[f]}"

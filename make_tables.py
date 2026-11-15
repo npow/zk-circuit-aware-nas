@@ -24,7 +24,7 @@ def tex(s):
 
 # ---------------- proxy correlation table ----------------
 A = S["A_proxy_vs_accuracy"]
-names = {"near": "NEAR", "synflow": "Synflow", "zico": "ZiCo", "meco": "MeCo", "zenas": "ZenNAS",
+names = {"near": "NEAR", "synflow": "Synflow", "zico": "ZiCo", "meco": "MeCo", "zenas": "Zen-style (variant)",
          "naswot": "NASWOT (ReLU patterns)", "naswot_sign": "NASWOT (pre-activation signs)"}
 fams = [("relu", "ReLU"), ("x2", r"$x^2$"), ("x3px", r"$x^3{+}x$"), ("x2px", r"$x^2{+}x$")]
 n_by = S["n_by_act"]
