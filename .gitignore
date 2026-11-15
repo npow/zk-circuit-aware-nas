@@ -13,8 +13,6 @@ build/
 *.pt
 *.pth
 checkpoints/
-results/sweep/
-results/sweep_*/
 results/ablation_100ep/
 *.log
 /tmp/
